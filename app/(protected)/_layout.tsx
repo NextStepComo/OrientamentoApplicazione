@@ -1,15 +1,19 @@
+// app/(protected)/_layout.tsx
+//QUANDO SEI LOGGATO
+import { useAuth } from "@/context/AuthContext";
 import "@/global.css";
-import { Stack } from "expo-router";
+import { Redirect, Stack } from "expo-router";
 
-export default function RootLayout() {
+export default function ProtectedLayout() {
+  const { isAuthenticated } = useAuth();
+
+  if (!isAuthenticated) {
+    return <Redirect href={{ pathname: "/login" as any }} />;  }
+
   return (
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      >
-        <Stack.Screen name="(tabs)"></Stack.Screen>
-        <Stack.Screen name="(modals)"></Stack.Screen>
-      </Stack>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="(tabs)" />
+      <Stack.Screen name="(modals)" />
+    </Stack>
   );
 }

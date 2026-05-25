@@ -1,57 +1,45 @@
+// app/login.tsx
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Text } from "@/components/ui/text";
+import "@/global.css";
+import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
+export default function LoginScreen() {
+  const [quizFatto, setQuizFatto] = useState(false);
+  const router = useRouter();
 
-export default function HomeScreen() {
-  const [value, setValue] = useState("");
-  const [check1, setCheck1] = useState(false);
-  const [check2, setCheck2] = useState(false);
-
-  function getValore(){
-    let val = "";
-    if(check1 == true){
-      val += "Prima opzione selezionata ";
+  const handleContinua = () => {
+    if (quizFatto) {
+      router.replace("/(protected)/(tabs)/contenuti" as any);
+    } else {
+      router.replace("/(protected)/(modals)/quiz" as any);
     }
-    if(check2 == true){
-      val += "Seconda opzione selezionata ";
-    }
-    return val;
-  }
-  
+  };
+
   return (
-    <View className="flex-1 items-center justify-center gap-4 bg-white px-8">
-      <Input
-        placeholder="Scrivi qualcosa..."
-        value={value}
-        onChangeText={setValue}
-        className="w-full size-30"
-      />
+    <View className="flex-1 justify-center items-center gap-6 p-6">
+      <Text className="text-2xl font-bold">Benvenuto</Text>
 
-      <View className="flex-row items-center gap-2">
+      <View className="flex-row items-center gap-3">
         <Checkbox
-          checked={check1}
-          onCheckedChange={(val) => setCheck1(val)}
+          id="checkQuiz"
+          checked={quizFatto}
+          onCheckedChange={(val) => setQuizFatto(val === true)}
         />
-        <Label>Opzione 1</Label>
+        <Label
+          nativeID="checkQuiz"
+          onPress={() => setQuizFatto(!quizFatto)}
+        >
+          Ho già fatto il quiz
+        </Label>
       </View>
 
-      <View className="flex-row items-center gap-2">
-        <Checkbox
-          checked={check2}
-          onCheckedChange={(val) => setCheck2(val)}
-        />
-        <Label>Opzione dhbjk2</Label>
-      </View>
-
-      <Button
-        className="bg-blue-500 px-10"
-        onPress={() => alert(`Hai scritto: ${value}, ${getValore()}`)}
-      >
-        <Text className="text-white">Invia</Text>
+      <Button onPress={handleContinua}>
+        <Text>Continua</Text>
       </Button>
     </View>
   );
