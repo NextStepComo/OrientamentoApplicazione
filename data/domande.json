@@ -1,0 +1,32 @@
+[
+    {
+      "id": 1,
+      "testo": "Dove sei nel tuo percorso?",
+      "cardTitolo1": "Ho finito le medie",
+      "cardDescrizione1": "Stai scegliendo la scuola superiore o un percorso di formazione professionale",
+      "cardTitolo2": "Ho finito le superiori",
+      "cardDescrizione2": "Stai scegliendo università, ITS Academy o un percorso post-diploma",
+      "cardTitolo3": "Voglio cambiare scuola",
+      "cardDescrizione3": "Hai già iniziato un percorso ma vuoi esplorare altre strade più adatte a te"
+    },
+    {
+      "id": 2,
+      "testo": "Cosa ti piace fare nel tempo libero?",
+      "cardTitolo1": "Tecnologia e Gaming",
+      "cardDescrizione1": "Videogiochi, programmazione, computer e gadget tecnologici",
+      "cardTitolo2": "Scienza ed Esperimenti",
+      "cardDescrizione2": "Risolvere problemi, fare calcoli, scoprire come funzionano le cose",
+      "cardTitolo3": "Arte e Creatività",
+      "cardDescrizione3": "Disegnare, scrivere, suonare, creare contenuti digitali o video"
+    },
+    {
+      "id": 3,
+      "testo": "Ti interessa la tecnologia?",
+      "cardTitolo1": "Moltissimo",
+      "cardDescrizione1": "Vorrei capire come creare software, app o gestire sistemi complessi",
+      "cardTitolo2": "Abbastanza",
+      "cardDescrizione2": "Mi piace usarla, ma voglio focalizzarmi sugli aspetti pratici o scientifici",
+      "cardTitolo3": "Preferisco altro",
+      "cardDescrizione3": "Mi interessano di più le materie teoriche, umanistiche o creative tradizionali"
+    }
+  ]
