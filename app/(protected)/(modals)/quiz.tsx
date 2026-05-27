@@ -1,17 +1,23 @@
 // app/(protected)/(modals)/quiz.tsx
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardDescription,
-    CardHeader,
-    CardTitle
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle
 } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 import DOMANDE from "@/data/domande.json";
 import "@/global.css";
+import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+const handleQualcosa = async () => {
+  const token = await SecureStore.getItemAsync("token");
+  
+};
 
 export default function QuizScreen() {
   const [domandaCorrente, setDomandaCorrente] = useState(0);
@@ -42,6 +48,7 @@ export default function QuizScreen() {
   };
 
   const progresso = ((domandaCorrente + 1) / DOMANDE.length) * 100;
+  
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9fafb" }}>
@@ -110,7 +117,10 @@ export default function QuizScreen() {
 
             {/* BLOCCO CENTRALE: Domanda + Card vicine tra loro */}
             <View style={{ flex: 1, justifyContent: "center", marginVertical: 10 }}>
-              
+              {/* Saluto */}
+              <Text style={{ color: "#111827", fontSize: 30, fontWeight: "700", marginBottom: 16 }}>
+                Ciao! 
+              </Text>
               {/* Domanda ravvicinata */}
               <View style={{ gap: 6, marginBottom: 20 }}>
                 <Text style={{ color: "#6b7280", fontSize: 13, fontWeight: "600", letterSpacing: 1.5, textTransform: "uppercase" }}>
@@ -219,10 +229,8 @@ export default function QuizScreen() {
             <Pressable 
               onPress={indietro} 
               style={{ paddingVertical: 12, alignItems: "center", justifyContent: "center" }}
-            >
-              <Text style={{ color: "#4b5563", fontSize: 15, fontWeight: "600" }}>
-                ← Indietro
-              </Text>
+              >
+              <Text style={{ color: "#4b5563", fontSize: 15, fontWeight: "600" }}>← Indietro</Text>
             </Pressable>
           )}
         </View>
