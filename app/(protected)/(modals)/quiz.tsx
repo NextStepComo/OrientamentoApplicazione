@@ -10,20 +10,30 @@ import { Text } from '@/components/ui/text';
 import DOMANDE from "@/data/domande.json";
 import "@/global.css";
 import * as SecureStore from "expo-secure-store";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-const handleQualcosa = async () => {
-  const token = await SecureStore.getItemAsync("token");
-  
-};
 
-export default function QuizScreen() {
+export default async function QuizScreen() {
   const [domandaCorrente, setDomandaCorrente] = useState(0);
   const [rispostaSelezionata, setRispostaSelezionata] = useState<string>("");
   const [risposteSalvate, setRisposteSalvate] = useState<string[]>([]);
   const [quizFinito, setQuizFinito] = useState<boolean>(false);
+
+  const [nomeUtente, setNomeUtente] = useState<string | null>("");
+
+  useEffect(() => {
+    async function caricaNomeUtente() {
+      try {
+        const name = await SecureStore.getItemAsync("full_name");
+        setNomeUtente(name || "Utente"); // Aggiorno lo stato col nome trovato
+      } catch (error) {
+        setNomeUtente("Utente");
+      }
+    }
+    caricaNomeUtente();
+  }, []);
 
   const avanza = () => {
     const nuoveRisposte = [...risposteSalvate]; //con ... prende tutti gli elem di risposteSalvate e li copia in nuoveRisposte
@@ -119,7 +129,7 @@ export default function QuizScreen() {
             <View style={{ flex: 1, justifyContent: "center", marginVertical: 10 }}>
               {/* Saluto */}
               <Text style={{ color: "#111827", fontSize: 30, fontWeight: "700", marginBottom: 16 }}>
-                Ciao! 
+                Ciao {nomeUtente}! 
               </Text>
               {/* Domanda ravvicinata */}
               <View style={{ gap: 6, marginBottom: 20 }}>

@@ -21,6 +21,13 @@ type LoginResponse = {
   token_type: string;
 };
 
+type PostMe = {
+  username: string;
+  full_name: string;
+  hashed_password: string;
+  disabled: boolean;
+};
+
 const loginUser = async (data: LoginBody): Promise<LoginResponse> => {
   const response = await axios.post<LoginResponse>(
     "http://10.0.1.51:8000/login",
@@ -48,8 +55,15 @@ export default function LoginScreen() {
     }
 
     try {
-      const response = await loginUser({ username, password });
-      await SecureStore.setItemAsync("token", response.access_token);
+      const responseLogin = await loginUser({ username, password });
+      await SecureStore.setItemAsync("token", responseLogin.access_token);
+      const responseMe = await axios.get<PostMe>("http://10.0.1.51:8000/users/me/", {
+        headers: {
+          Authorization: `Bearer ${responseLogin.access_token}`
+        }
+      });
+      await SecureStore.setItemAsync("full_name", responseMe.data.full_name);
+
       if (quizFatto) {
         router.replace("/(protected)/(tabs)/contenuti" as any);
       } else {
