@@ -1,6 +1,5 @@
 // app/index.tsx
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
@@ -35,6 +34,7 @@ export default function LoginScreen() {
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
+  const { user } = useAuth();
 
   const handleContinua = async () => {
     if (!username || !password) {
@@ -45,7 +45,7 @@ export default function LoginScreen() {
     try {
       const responseLogin = await loginUser({ username, password });
       await login(responseLogin.access_token, responseLogin.refresh_token);
-      if (quizFatto) {
+      if (user?.quizsolved) {
         router.replace("/contenuti");
       } else {
         router.replace("/quiz");
@@ -89,20 +89,6 @@ export default function LoginScreen() {
             secureTextEntry
           />
         </View>
-      </View>
-
-      <View className="flex-row items-center gap-3">
-        <Checkbox
-          id="checkQuiz"
-          checked={quizFatto}
-          onCheckedChange={(val) => setQuizFatto(val === true)}
-        />
-        <Label
-          nativeID="checkQuiz"
-          onPress={() => setQuizFatto(!quizFatto)}
-        >
-          Ho già fatto il quiz
-        </Label>
       </View>
 
       <Button onPress={handleContinua} className="w-full">
