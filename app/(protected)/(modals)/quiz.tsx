@@ -1,15 +1,16 @@
 // app/(protected)/(modals)/quiz.tsx
-import { Button } from "@/components/ui/button";
-import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Text } from '@/components/ui/text';
-import { C, S_GLOBAL } from "@/constants/theme";
 import { useAuth } from '@/context/AuthContext';
-import "@/global.css";
 import api from "@/utils/api";
 import { useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+// Importazioni dai componenti della libreria React Native Reusable
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Text } from '@/components/ui/text';
 
 type InviaRisposta = { userID: number | undefined, domanda: number, risposta: number }
 type QuizResponse = { risposta: string }
@@ -79,34 +80,47 @@ export default function QuizScreen() {
 
   const progresso = tutteDomande.length > 0 ? ((domandaCorrente + 1) / tutteDomande.length) * 100 : 0;
   const esUltimaDomanda = domandaCorrente === tutteDomande.length - 1;
+  const disabilitato = rispostaSelezionata === "";
 
   return (
-    <SafeAreaView style={quizStyles.container}>
-      <View style={quizStyles.innerLayout}>
+    // Sfondo neutro chiaro e pulito
+    <SafeAreaView className="flex-1 bg-[#F5F7FA]">
+      <View className="flex-1 px-6 py-6 justify-between">
 
-        <View style={{ gap: 14 }}>
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Text style={{ color: C.textSoft, fontSize: 14, fontWeight: "600" }}>Quiz di orientamento</Text>
-            <View style={quizStyles.counterBadge}>
-              <Text style={{ color: C.nsBlue, fontSize: 13, fontWeight: "700" }}>
+        {/* ── HEADER & PROGRESS BAR ── */}
+        <View className="gap-3.5">
+          <View className="flex-row justify-between items-center">
+            <Text className="text-[#556070] text-sm font-bold tracking-wide">Quiz di orientamento</Text>
+            {/* Badge con sfondo Tinta 20% e testo 100% */}
+            <Badge className="bg-[#CCDFFD] border border-[#066CF4]/20 px-3 py-1 rounded-full">
+              <Text className="text-[#066CF4] text-xs font-black">
                 {domandaCorrente + 1} / {tutteDomande.length}
               </Text>
-            </View>
+            </Badge>
           </View>
 
-          <View style={quizStyles.trackBar}>
-            <View style={[quizStyles.progressBar, { width: `${progresso}%` }]} />
+          {/* Barra del progresso basata sulla palette (Sfondo 20%, Fill 100%) */}
+          <View className="h-2.5 bg-[#CCDFFD] rounded-full overflow-hidden">
+            <View style={{ width: `${progresso}%` }} className="h-full bg-[#066CF4] rounded-full" />
           </View>
         </View>
 
-        <View style={{ flex: 1, justifyContent: "center", marginVertical: 10 }}>
-          <Text style={quizStyles.welcomeText}>Ciao {user?.full_name}!</Text>
-          <View style={{ gap: 6, marginBottom: 20 }}>
-            <Text style={quizStyles.eyebrow}>Domanda {domandaCorrente + 1}</Text>
-            <Text style={quizStyles.title}>{tutteDomande[domandaCorrente]?.q_text ?? "Caricamento..."}</Text>
+        {/* ── CORPO DELLA DOMANDA ── */}
+        <View className="flex-1 justify-center my-2">
+          <Text className="text-[#0B131F] text-3xl font-extrabold tracking-tight mb-1">
+            Ciao {user?.full_name}!
+          </Text>
+          <View className="gap-1.5 mb-5">
+            <Text className="text-[#066CF4] text-[11px] font-black tracking-widest uppercase">
+              Domanda {domandaCorrente + 1}
+            </Text>
+            <Text className="text-[#1A2433] text-2xl font-bold leading-tight tracking-tight">
+              {tutteDomande[domandaCorrente]?.q_text ?? "Caricamento della domanda..."}
+            </Text>
           </View>
 
-          <View style={{ gap: 12 }}>
+          {/* OPZIONI DI RISPOSTA STILE RADIO-CARD INTERATTIVE */}
+          <View className="gap-3.5">
             {["1", "2", "3"].map((idx) => {
               const isSel = rispostaSelezionata === idx;
               const t = tutteDomande[domandaCorrente]?.ans_text;
@@ -114,15 +128,39 @@ export default function QuizScreen() {
               const desc = idx === "1" ? t?.cardDescrizione1 : idx === "2" ? t?.cardDescrizione2 : t?.cardDescrizione3;
 
               return (
-                <Pressable key={idx} onPress={() => setRispostaSelezionata(idx)}>
-                  <Card style={[quizStyles.optionCard, { borderColor: isSel ? C.nsBlue : C.line, backgroundColor: isSel ? C.nsBlue50 : C.surface }]}>
-                    <CardHeader style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", padding: 16 }}>
-                      <View style={{ flex: 1, paddingRight: 10 }}>
-                        <CardTitle style={{ color: C.nsInk, fontSize: 16, fontWeight: "700" }}>{title}</CardTitle>
-                        <CardDescription style={{ color: C.textSoft, fontSize: 13, marginTop: 4, lineHeight: 18 }}>{desc}</CardDescription>
+                <Pressable 
+                  key={idx} 
+                  onPress={() => setRispostaSelezionata(idx)}
+                  className="active:opacity-95"
+                >
+                  <Card 
+                    className={`border-2 rounded-2xl p-0.5 shadow-sm ${
+                      isSel 
+                        ? "border-[#066CF4] bg-[#E6F0FE]" // Selezionato: Bordo 100% e Sfondo Tinta 10%
+                        : "border-[#CCDFFD] bg-white"      // Non selezionato: Bordo Tinta 20%
+                    }`}
+                  >
+                    <CardHeader className="flex-row justify-between items-center p-4">
+                      <View className="flex-1 pr-3">
+                        <CardTitle className={`text-base font-bold ${
+                          isSel ? "text-[#066CF4]" : "text-[#1A2433]"
+                        }`}>
+                          {title}
+                        </CardTitle>
+                        <CardDescription className={`text-xs mt-1 leading-normal ${
+                          isSel ? "text-[#4A5E7A]" : "text-[#65758C]"
+                        }`}>
+                          {desc}
+                        </CardDescription>
                       </View>
-                      <View style={[quizStyles.radioOuter, { borderColor: isSel ? C.nsBlue : C.lineStrong, backgroundColor: isSel ? C.nsBlue : "transparent" }]}>
-                        {isSel && <View style={quizStyles.radioInner} />}
+                      
+                      {/* Radio Indicator Visuale */}
+                      <View 
+                        className={`w-5 h-5 rounded-full border-2 items-center justify-center ${
+                          isSel ? "border-[#066CF4] bg-[#066CF4]" : "border-[#A4B8D4] bg-transparent"
+                        }`}
+                      >
+                        {isSel && <View className="w-2 h-2 rounded-full bg-white" />}
                       </View>
                     </CardHeader>
                   </Card>
@@ -132,25 +170,31 @@ export default function QuizScreen() {
           </View>
         </View>
 
-        <View style={{ gap: 10, marginTop: 14 }}>
+        {/* ── BOTTONI DI AZIONE ── */}
+        <View className="gap-2.5 mt-2">
           <Button
-            style={[
-              quizStyles.actionButton, 
-              { backgroundColor: (rispostaSelezionata === "") ? C.nsBluePale : C.nsBlue }
-            ]}
+            size="lg"
+            className={`rounded-xl w-full h-14 shadow-md ${
+              disabilitato ? "bg-[#9BC2FB]" : "bg-[#066CF4]" // Disabilitato: Tinta 40% | Attivo: 100%
+            }`}
             onPress={avanza}
-            disabled={rispostaSelezionata === ""}
-            android_ripple={{ color: 'rgba(255, 255, 255, 0.2)' }} 
+            disabled={disabilitato}
           >
-            <Text style={{ color: (rispostaSelezionata === "") ? C.textMute : "#ffffff", fontSize: 16, fontWeight: "700" }}>
-              {esUltimaDomanda ? "Fine" : "Avanti →"}
+            <Text className={`text-base font-bold ${
+              disabilitato ? "text-[#556070]" : "text-white"
+            }`}>
+              {esUltimaDomanda ? "Fine" : "Avanti"}
             </Text>
           </Button>
 
           {domandaCorrente > 0 && (
-            <Pressable onPress={indietro} style={quizStyles.backBtn}>
-              <Text style={{ color: C.textSoft, fontSize: 15, fontWeight: "600" }}>← Indietro</Text>
-            </Pressable>
+            <Button 
+              variant="ghost" 
+              className="py-3 items-center justify-center" 
+              onPress={indietro}
+            >
+              <Text className="text-[#556070] text-sm font-bold">Indietro</Text>
+            </Button>
           )}
         </View>
 
@@ -158,19 +202,3 @@ export default function QuizScreen() {
     </SafeAreaView>
   );
 }
-
-const quizStyles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: C.bg },
-  innerLayout: { flex: 1, paddingHorizontal: S_GLOBAL.paddingCanvas, paddingVertical: 24, justifyContent: "space-between" },
-  eyebrow: { color: C.textMute, fontSize: 12, fontWeight: "700", letterSpacing: 1.5, textTransform: "uppercase" },
-  title: { color: C.nsInk, fontSize: 26, fontWeight: "800", lineHeight: 34, letterSpacing: -0.5 },
-  counterBadge: { backgroundColor: C.nsBluePale, paddingHorizontal: 12, paddingVertical: 4, borderRadius: S_GLOBAL.radiusButton },
-  trackBar: { height: 6, backgroundColor: C.surfaceAlt, borderRadius: S_GLOBAL.radiusButton, overflow: "hidden" },
-  progressBar: { height: "100%", backgroundColor: C.nsBlue, borderRadius: S_GLOBAL.radiusButton },
-  welcomeText: { color: C.nsInk, fontSize: 28, fontWeight: "800", marginBottom: 8, letterSpacing: -0.5 },
-  optionCard: { borderWidth: 2, borderRadius: S_GLOBAL.radiusCard, ...S_GLOBAL.shadow },
-  radioOuter: { width: 22, height: 22, borderRadius: 11, borderWidth: 2, justifyContent: "center", alignItems: "center" },
-  radioInner: { width: 8, height: 8, borderRadius: 4, backgroundColor: C.surface },
-  actionButton: { borderRadius: S_GLOBAL.radiusButton, paddingVertical: 16, alignItems: "center", justifyContent: "center", width: "100%", height: 54 },
-  backBtn: { paddingVertical: 12, alignItems: "center", justifyContent: "center" }
-});

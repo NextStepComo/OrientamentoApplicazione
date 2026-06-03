@@ -37,9 +37,9 @@ export default function LoginScreen() {
       const responseLogin = await loginUser({ username, password });
       await login(responseLogin.access_token, responseLogin.refresh_token);
       if (user?.quizsolved) {
-        router.replace("/contenuti");
+        router.replace("/(protected)/(tabs)/contenuti");
       } else {
-        router.replace("/quiz");
+        router.replace("/(protected)/(modals)/quiz");
       }
     } catch (error: any) {
       Alert.alert("Errore", "Login fallito, controlla le credenziali");
@@ -47,17 +47,24 @@ export default function LoginScreen() {
   };
 
   return (
-    <View className="flex-1 justify-center items-center p-6 bg-[#F8FAFC]">
-      <View className="w-full p-6 bg-white border border-[#0F1729]/[0.08] rounded-[20px] shadow-lg shadow-[#0F1729]/[0.06] gap-6">
+    // Sfondo dell'applicazione impostato sul grigio/blu neutro chiaro della palette
+    <View className="flex-1 justify-center items-center p-6 bg-[#F5F7FA]">
+      
+      {/* CARD DI LOGIN - Bordo coordinato con la Tinta 20% (#CCDFFD) */}
+      <View className="w-full p-6 bg-white border border-[#CCDFFD] rounded-[24px] shadow-sm gap-6">
         
-        <View className="gap-1 items-center mb-2">
-          <Text className="text-2xl font-extrabold text-[#0B1220] tracking-tight">Bentornato</Text>
-          <Text className="text-sm text-[#475569] font-medium">Accedi per continuare il tuo percorso</Text>
+        {/* HEADER */}
+        <View className="gap-1 items-center mb-1">
+          <Text className="text-2xl font-black text-[#0B131F] tracking-tight">Bentornato</Text>
+          <Text className="text-sm text-[#556070] font-medium text-center">
+            Accedi per continuare il tuo percorso
+          </Text>
         </View>
 
+        {/* INPUT FORM */}
         <View className="w-full gap-4">
           <View className="gap-2">
-            <Label nativeID="email" className="text-[#0B1220] font-semibold text-[13px]">Email</Label>
+            <Label nativeID="email" className="text-[#1A2433] font-bold text-[13px]">Email</Label>
             <Input
               nativeID="email"
               placeholder="nome@esempio.com"
@@ -65,26 +72,34 @@ export default function LoginScreen() {
               onChangeText={setEmail}
               keyboardType="email-address"
               autoCapitalize="none"
-              className="h-12 rounded-full border-[#0F1729]/[0.14] px-4"
+              placeholderTextColor="#8893A7"
+              className="h-12 rounded-full border-[#CCDFFD] px-4 bg-white text-[#0B131F]"
             />
           </View>
 
           <View className="gap-2">
-            <Label nativeID="password" className="text-[#0B1220] font-semibold text-[13px]">Password</Label>
+            <Label nativeID="password" className="text-[#1A2433] font-bold text-[13px]">Password</Label>
             <Input
               nativeID="password"
               placeholder="••••••••"
               value={password}
               onChangeText={setPassword}
               secureTextEntry
-              className="h-12 rounded-full border-[#0F1729]/[0.14] px-4"
+              placeholderTextColor="#8893A7"
+              className="h-12 rounded-full border-[#CCDFFD] px-4 bg-white text-[#0B131F]"
             />
           </View>
         </View>
 
-        <Button onPress={handleContinua} className="w-full h-12 bg-[#066CF4] rounded-full active:opacity-90">
-          <Text className="text-white font-bold text-base">Continua</Text>
+        {/* SUBMIT BUTTON - Blu principale al 100% (#066CF4) */}
+        <Button 
+          size="lg" 
+          onPress={handleContinua} 
+          className="w-full h-12 bg-[#066CF4] rounded-full shadow-sm active:opacity-90 flex-row items-center justify-center"
+        >
+          <Text className="text-white font-black text-base">Continua</Text>
         </Button>
+
       </View>
     </View>
   );

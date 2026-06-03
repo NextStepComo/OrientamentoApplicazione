@@ -1,0 +1,27 @@
+{
+    "hero": {
+      "eyebrow": "Il tuo indirizzo ideale",
+      "emoji": "💻",
+      "name": "Informatico",
+      "compatibility": "95% compatibilità"
+    },
+    "matchBars": [
+      { "label": "Logica", "pct": 95, "color": "#066CF4", "delay": 200 },
+      { "label": "Pratica", "pct": 88, "color": "#10B981", "delay": 350 },
+      { "label": "Creatività", "pct": 72, "color": "#8B5CF6", "delay": 500 },
+      { "label": "Sociale", "pct": 48, "color": "#F59E0B", "delay": 650 }
+    ],
+    "stats": [
+      { "icon": "work", "value": "92%", "label": "Domanda lavoro" },
+      { "icon": "euro-symbol", "value": "€38k", "label": "Stipendio iniziale" },
+      { "icon": "school", "value": "+18%", "label": "Crescita 2024–29" }
+    ],
+    "description": "Ti formerà come tecnico dei sistemi digitali, programmatore e analista. Lavorerai con reti, database e sviluppo software — le competenze più richieste in Italia.",
+    "subjects": ["Sistemi e Reti", "Informatica", "TPSIT", "Matematica", "Inglese Tecnico"],
+    "jobs": ["Sviluppatore", "Sistemista", "Cybersecurity", "Data Analyst", "Cloud Engineer"],
+    "alternativeItems": [
+      { "emoji": "⚡", "name": "Elettronica ed Elettrotecnica", "meta": "Tecnologico · più hardware", "pct": 82 },
+      { "emoji": "🎬", "name": "Grafica e Comunicazione", "meta": "Tecnologico · creativo + digitale", "pct": 71 },
+      { "emoji": "🔬", "name": "Scientifico — Sc. Applicate", "meta": "Liceo · matematica + informatica", "pct": 68 }
+    ]
+}
