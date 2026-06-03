@@ -7,7 +7,7 @@ import { createContext, ReactNode, useContext, useEffect, useState } from "react
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
-  login: (token: string) => Promise<void>;
+  login: (token: string, refreshToken: string) => Promise<void>;
   logout: () => Promise<void>;
 };
 
@@ -30,8 +30,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(true);
   };
 
-  const login = async (token: string) => {
+  const login = async (token: string, refreshToken: string) => {
     await SecureStore.setItemAsync("token", token);
+    await SecureStore.setItemAsync("refresh_token", refreshToken);
     await fetchUser(token);
   };
 

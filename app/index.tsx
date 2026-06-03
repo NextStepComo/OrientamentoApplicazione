@@ -18,6 +18,7 @@ type LoginBody = {
 
 type LoginResponse = {
   access_token: string;
+  refresh_token: string;
   token_type: string;
 };
 
@@ -43,7 +44,7 @@ export default function LoginScreen() {
 
     try {
       const responseLogin = await loginUser({ username, password });
-      await login(responseLogin.access_token);
+      await login(responseLogin.access_token, responseLogin.refresh_token);
       if (quizFatto) {
         router.replace("/contenuti");
       } else {

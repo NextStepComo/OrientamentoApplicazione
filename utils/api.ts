@@ -9,7 +9,6 @@ const api = axios.create({
   },
 });
 
-// Aggiunge automaticamente il token ad ogni richiesta
 api.interceptors.request.use(async (config) => {
   const token = await SecureStore.getItemAsync("token");
   if (token) {
@@ -18,4 +17,29 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-export default api;
+api.interceptors.response.use(
+    (response) => response,
+    async (error) => {
+      const original = error.config;
+      if (error.response?.status === 401 && !original._retry) {
+        original._retry = true;
+        try {
+          const refreshToken = await SecureStore.getItemAsync("refresh_token");
+          const response = await axios.post("http://10.0.1.51:8000/refresh", {
+            refresh_token: refreshToken
+          });
+          const { access_token, refresh_token } = response.data;
+          await SecureStore.setItemAsync("token", access_token);
+          await SecureStore.setItemAsync("refresh_token", refresh_token);
+          original.headers.Authorization = `Bearer ${access_token}`;
+          return api(original);
+        } catch {
+          await SecureStore.deleteItemAsync("token");
+          await SecureStore.deleteItemAsync("refresh_token");
+        }
+      }
+      return Promise.reject(error);
+    }
+  );
+  
+  export default api;
