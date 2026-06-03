@@ -25,12 +25,16 @@ api.interceptors.response.use(
         original._retry = true;
         try {
           const refreshToken = await SecureStore.getItemAsync("refresh_token");
-          const response = await axios.post("http://10.0.1.51:8000/refresh", {
-            refresh_token: refreshToken
+          const response = await axios.post("http://10.0.1.51:8000/refresh", {}, {
+            headers: {
+              Authorization: `Bearer ${refreshToken}`
+            }
           });
           const { access_token, refresh_token } = response.data;
           await SecureStore.setItemAsync("token", access_token);
-          await SecureStore.setItemAsync("refresh_token", refresh_token);
+          if (refresh_token) {
+            await SecureStore.setItemAsync("refresh_token", refresh_token);
+          }          
           original.headers.Authorization = `Bearer ${access_token}`;
           return api(original);
         } catch {
