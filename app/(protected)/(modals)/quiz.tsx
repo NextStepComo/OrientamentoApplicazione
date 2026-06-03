@@ -1,52 +1,97 @@
 // app/(protected)/(modals)/quiz.tsx
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle
-} from '@/components/ui/card';
+import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
-import DOMANDE from "@/data/domande.json";
+import { useAuth } from '@/context/AuthContext';
 import "@/global.css";
-import * as SecureStore from "expo-secure-store";
+import axios from "axios";
 import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+type InviaRisposta = {
+  userID: number | undefined,
+  domanda: number,
+  risposta: number
+}
 
-export default async function QuizScreen() {
+type QuizResponse = {
+  risposta: string
+}
+
+type AnsText = {
+  cardTitolo1: string, cardDescrizione1: string,
+  cardTitolo2: string, cardDescrizione2: string,
+  cardTitolo3: string, cardDescrizione3: string,
+}
+
+type QuizQandA = {
+  q_id: number,
+  q_text: string,
+  ans_text: AnsText
+}
+
+export default function QuizScreen() {
+  const { user } = useAuth();
   const [domandaCorrente, setDomandaCorrente] = useState(0);
   const [rispostaSelezionata, setRispostaSelezionata] = useState<string>("");
   const [risposteSalvate, setRisposteSalvate] = useState<string[]>([]);
   const [quizFinito, setQuizFinito] = useState<boolean>(false);
+  const [tutteDomande, setTutteDomande] = useState<QuizQandA[]>([]);
 
-  const [nomeUtente, setNomeUtente] = useState<string | null>("");
+  const sendQuizData = async (data: InviaRisposta): Promise<QuizResponse> => {
+    const response = await axios.post<QuizResponse>(
+      "http://10.0.1.51:8000/acquire/quizResponses",
+      data,
+      {
+        headers: {
+          'accept': 'application/json',
+          'Content-Type': 'application/json'
+        }
+      }
+    );
+    return response.data;
+  }
+
+  const getQuizData = async (nQ: number): Promise<QuizQandA> => {
+    const response = await axios.get<QuizQandA>(
+      `http://10.0.1.51:8000/acquire/quizQuestions?q=${nQ}`
+    );
+    return response.data;
+  }
 
   useEffect(() => {
-    async function caricaNomeUtente() {
-      try {
-        const name = await SecureStore.getItemAsync("full_name");
-        setNomeUtente(name || "Utente"); // Aggiorno lo stato col nome trovato
-      } catch (error) {
-        setNomeUtente("Utente");
-      }
-    }
-    caricaNomeUtente();
+    Promise.all(
+      Array.from({ length: 3 }, (_, i) => getQuizData(i + 1))
+    ).then(setTutteDomande)
+     .catch((err) => console.error("Errore caricamento domande:", err));
   }, []);
 
   const avanza = () => {
-    const nuoveRisposte = [...risposteSalvate]; //con ... prende tutti gli elem di risposteSalvate e li copia in nuoveRisposte
+    const nuoveRisposte = [...risposteSalvate];
     nuoveRisposte[domandaCorrente] = rispostaSelezionata;
     setRisposteSalvate(nuoveRisposte);
 
-    if (domandaCorrente < DOMANDE.length - 1) {
+    if (domandaCorrente < tutteDomande.length - 1) {
       setDomandaCorrente(domandaCorrente + 1);
-      // Se avevamo già risposto alla domanda successiva (tornando indietro), ricarica la risposta
-      setRispostaSelezionata(risposteSalvate[domandaCorrente + 1] || ""); 
+      setRispostaSelezionata(risposteSalvate[domandaCorrente + 1] || "");
     } else {
       setQuizFinito(true);
     }
+
+    const datiQuiz: InviaRisposta = {
+      userID: user?.userid,
+      domanda: domandaCorrente + 1,
+      risposta: parseInt(rispostaSelezionata, 10)
+    };
+
+    sendQuizData(datiQuiz)
+      .then((res) => {
+        console.log("Risposta salvata con successo sul server:", res);
+      })
+      .catch((err) => {
+        console.error("Errore durante l'invio della risposta del quiz:", err.response?.data || err.message);
+      });
   };
 
   const indietro = () => {
@@ -57,8 +102,7 @@ export default async function QuizScreen() {
     }
   };
 
-  const progresso = ((domandaCorrente + 1) / DOMANDE.length) * 100;
-  
+  const progresso = ((domandaCorrente + 1) / tutteDomande.length) * 100;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#f9fafb" }}>
@@ -77,17 +121,17 @@ export default async function QuizScreen() {
             </View>
 
             <View style={{ gap: 12 }}>
-              {DOMANDE.map((domanda, index) => {
+              {tutteDomande.map((domanda, index) => {
                 const valoreRisposta = risposteSalvate[index];
                 let testoRisposta = "";
-                if (valoreRisposta === "1") testoRisposta = domanda.cardTitolo1;
-                if (valoreRisposta === "2") testoRisposta = domanda.cardTitolo2;
-                if (valoreRisposta === "3") testoRisposta = domanda.cardTitolo3;
+                if (valoreRisposta === "1") testoRisposta = domanda.ans_text?.cardTitolo1;
+                if (valoreRisposta === "2") testoRisposta = domanda.ans_text?.cardTitolo2;
+                if (valoreRisposta === "3") testoRisposta = domanda.ans_text?.cardTitolo3;
 
                 return (
-                  <Card key={domanda.id} style={{ borderColor: "#e5e7eb", borderWidth: 2, borderRadius: 16, backgroundColor: "#ffffff" }}>
+                  <Card key={domanda.q_id} style={{ borderColor: "#e5e7eb", borderWidth: 2, borderRadius: 16, backgroundColor: "#ffffff" }}>
                     <CardHeader style={{ padding: 16, gap: 4 }}>
-                      <Text style={{ color: "#4b5563", fontSize: 13, fontWeight: "600" }}>{domanda.testo}</Text>
+                      <Text style={{ color: "#4b5563", fontSize: 13, fontWeight: "600" }}>{domanda.q_text}</Text>
                       <Text style={{ color: "#2563eb", fontSize: 15, fontWeight: "700" }}>{testoRisposta}</Text>
                     </CardHeader>
                   </Card>
@@ -96,12 +140,11 @@ export default async function QuizScreen() {
             </View>
           </View>
         )
-        
+
         :
-        
-        ( //else di quizFinito
-          /* Schermata Quiz attiva */
-          <> {/*Per mantenere il codice con i View separati se no il justifyContent: center non andrebbe */}
+
+        (
+          <>
             {/* Header */}
             <View style={{ gap: 14 }}>
               <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
@@ -110,7 +153,7 @@ export default async function QuizScreen() {
                 </Text>
                 <View style={{ backgroundColor: "#e0f2fe", paddingHorizontal: 12, paddingVertical: 4, borderRadius: 999 }}>
                   <Text style={{ color: "#0369a1", fontSize: 13, fontWeight: "700" }}>
-                    {domandaCorrente + 1} / {DOMANDE.length}
+                    {domandaCorrente + 1} / {tutteDomande.length}
                   </Text>
                 </View>
               </View>
@@ -129,38 +172,34 @@ export default async function QuizScreen() {
             <View style={{ flex: 1, justifyContent: "center", marginVertical: 10 }}>
               {/* Saluto */}
               <Text style={{ color: "#111827", fontSize: 30, fontWeight: "700", marginBottom: 16 }}>
-                Ciao {nomeUtente}! 
+                Ciao {user?.full_name}!
               </Text>
-              {/* Domanda ravvicinata */}
+              {/* Domanda */}
               <View style={{ gap: 6, marginBottom: 20 }}>
                 <Text style={{ color: "#6b7280", fontSize: 13, fontWeight: "600", letterSpacing: 1.5, textTransform: "uppercase" }}>
                   Domanda {domandaCorrente + 1}
                 </Text>
                 <Text style={{ color: "#111827", fontSize: 26, fontWeight: "800", lineHeight: 34, letterSpacing: -0.5 }}>
-                  {DOMANDE[domandaCorrente].testo}
+                  {tutteDomande[domandaCorrente]?.q_text ?? "Caricamento..."}
                 </Text>
               </View>
 
               {/* Card risposte */}
               <View style={{ gap: 12 }}>
-                
+
                 {/* Opzione 1 */}
                 <Pressable onPress={() => setRispostaSelezionata("1")}>
                   <Card style={{ borderColor: rispostaSelezionata === "1" ? "#2563eb" : "#e5e7eb", borderWidth: 2, borderRadius: 16, backgroundColor: rispostaSelezionata === "1" ? "#eff6ff" : "#ffffff" }}>
                     <CardHeader style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                       <View style={{ flex: 1, paddingRight: 10 }}>
-                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{DOMANDE[domandaCorrente].cardTitolo1}</CardTitle>
-                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{DOMANDE[domandaCorrente].cardDescrizione1}</CardDescription>
+                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{tutteDomande[domandaCorrente]?.ans_text?.cardTitolo1}</CardTitle>
+                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{tutteDomande[domandaCorrente]?.ans_text?.cardDescrizione1}</CardDescription>
                       </View>
                       <View style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 10,
-                        borderWidth: 2,
-                        borderColor: rispostaSelezionata === "1" ? "#2563eb" : "#d1d5db",// funzione con if else come prima
+                        width: 20, height: 20, borderRadius: 10, borderWidth: 2,
+                        borderColor: rispostaSelezionata === "1" ? "#2563eb" : "#d1d5db",
                         backgroundColor: rispostaSelezionata === "1" ? "#2563eb" : "transparent",
-                        justifyContent: "center",
-                        alignItems: "center"
+                        justifyContent: "center", alignItems: "center"
                       }}>
                         {rispostaSelezionata === "1" && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#ffffff" }} />}
                       </View>
@@ -173,18 +212,14 @@ export default async function QuizScreen() {
                   <Card style={{ borderColor: rispostaSelezionata === "2" ? "#2563eb" : "#e5e7eb", borderWidth: 2, borderRadius: 16, backgroundColor: rispostaSelezionata === "2" ? "#eff6ff" : "#ffffff" }}>
                     <CardHeader style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                       <View style={{ flex: 1, paddingRight: 10 }}>
-                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{DOMANDE[domandaCorrente].cardTitolo2}</CardTitle>
-                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{DOMANDE[domandaCorrente].cardDescrizione2}</CardDescription>
+                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{tutteDomande[domandaCorrente]?.ans_text?.cardTitolo2}</CardTitle>
+                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{tutteDomande[domandaCorrente]?.ans_text?.cardDescrizione2}</CardDescription>
                       </View>
                       <View style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 10,
-                        borderWidth: 2,
+                        width: 20, height: 20, borderRadius: 10, borderWidth: 2,
                         borderColor: rispostaSelezionata === "2" ? "#2563eb" : "#d1d5db",
                         backgroundColor: rispostaSelezionata === "2" ? "#2563eb" : "transparent",
-                        justifyContent: "center",
-                        alignItems: "center"
+                        justifyContent: "center", alignItems: "center"
                       }}>
                         {rispostaSelezionata === "2" && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#ffffff" }} />}
                       </View>
@@ -197,18 +232,14 @@ export default async function QuizScreen() {
                   <Card style={{ borderColor: rispostaSelezionata === "3" ? "#2563eb" : "#e5e7eb", borderWidth: 2, borderRadius: 16, backgroundColor: rispostaSelezionata === "3" ? "#eff6ff" : "#ffffff" }}>
                     <CardHeader style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
                       <View style={{ flex: 1, paddingRight: 10 }}>
-                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{DOMANDE[domandaCorrente].cardTitolo3}</CardTitle>
-                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{DOMANDE[domandaCorrente].cardDescrizione3}</CardDescription>
+                        <CardTitle style={{ color: "#111827", fontSize: 16, fontWeight: "600" }}>{tutteDomande[domandaCorrente]?.ans_text?.cardTitolo3}</CardTitle>
+                        <CardDescription style={{ color: "#4b5563", fontSize: 13, marginTop: 4, lineHeight: 18 }}>{tutteDomande[domandaCorrente]?.ans_text?.cardDescrizione3}</CardDescription>
                       </View>
                       <View style={{
-                        width: 20,
-                        height: 20,
-                        borderRadius: 10,
-                        borderWidth: 2,
+                        width: 20, height: 20, borderRadius: 10, borderWidth: 2,
                         borderColor: rispostaSelezionata === "3" ? "#2563eb" : "#d1d5db",
                         backgroundColor: rispostaSelezionata === "3" ? "#2563eb" : "transparent",
-                        justifyContent: "center",
-                        alignItems: "center"
+                        justifyContent: "center", alignItems: "center"
                       }}>
                         {rispostaSelezionata === "3" && <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: "#ffffff" }} />}
                       </View>
@@ -230,16 +261,15 @@ export default async function QuizScreen() {
             className="w-full"
           >
             <Text style={{ color: "#ffffff", fontSize: 16, fontWeight: "700" }}>
-              {quizFinito ? "Chiudi" : domandaCorrente === DOMANDE.length - 1 ? "Fine" : "Avanti →"}
+              {quizFinito ? "Chiudi" : domandaCorrente === tutteDomande.length - 1 ? "Fine" : "Avanti →"}
             </Text>
           </Button>
 
-          {/* Mostra il pulsante "Indietro" solo se non siamo alla prima pagina e se il quiz non è finito */}
           {!quizFinito && domandaCorrente > 0 && (
-            <Pressable 
-              onPress={indietro} 
+            <Pressable
+              onPress={indietro}
               style={{ paddingVertical: 12, alignItems: "center", justifyContent: "center" }}
-              >
+            >
               <Text style={{ color: "#4b5563", fontSize: 15, fontWeight: "600" }}>← Indietro</Text>
             </Pressable>
           )}

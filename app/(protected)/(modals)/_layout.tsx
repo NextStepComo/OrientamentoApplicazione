@@ -1,4 +1,4 @@
-//LANDING PAGE QUANDO NON SEI LOGGATO
+//quiz
 import "@/global.css";
 import { Stack } from "expo-router";
 

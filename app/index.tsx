@@ -4,10 +4,10 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
+import { useAuth } from "@/context/AuthContext";
 import "@/global.css";
 import axios from "axios";
 import { useRouter } from "expo-router";
-import * as SecureStore from "expo-secure-store";
 import { useState } from "react";
 import { Alert, View } from "react-native";
 
@@ -19,13 +19,6 @@ type LoginBody = {
 type LoginResponse = {
   access_token: string;
   token_type: string;
-};
-
-type PostMe = {
-  username: string;
-  full_name: string;
-  hashed_password: string;
-  disabled: boolean;
 };
 
 const loginUser = async (data: LoginBody): Promise<LoginResponse> => {
@@ -43,6 +36,7 @@ const loginUser = async (data: LoginBody): Promise<LoginResponse> => {
 };
 
 export default function LoginScreen() {
+  const { login } = useAuth();
   const [quizFatto, setQuizFatto] = useState(false);
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,22 +50,21 @@ export default function LoginScreen() {
 
     try {
       const responseLogin = await loginUser({ username, password });
-      await SecureStore.setItemAsync("token", responseLogin.access_token);
-      const responseMe = await axios.get<PostMe>("http://10.0.1.51:8000/users/me/", {
-        headers: {
-          Authorization: `Bearer ${responseLogin.access_token}`
-        }
-      });
-      await SecureStore.setItemAsync("full_name", responseMe.data.full_name);
-
+      await login(responseLogin.access_token);
       if (quizFatto) {
-        router.replace("/(protected)/(tabs)/contenuti" as any);
+        router.replace("/contenuti");
       } else {
-        router.replace("/(protected)/(modals)/quiz" as any);
+        router.replace("/quiz");
       }
     } catch (error: any) {
       Alert.alert("Errore", "Login fallito, controlla le credenziali");
-      console.log(error.response);
+      
+      if (error.response) {
+        console.log("Dati Errore:", error.response.data);
+        console.log("Status Errore:", error.response.status);
+      } else {
+        console.log("Errore di rete o configurazione:", error.message);
+      }
     }
   };
 
