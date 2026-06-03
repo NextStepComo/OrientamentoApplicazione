@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Text } from "@/components/ui/text";
 import { useAuth } from "@/context/AuthContext";
 import "@/global.css";
-import axios from "axios";
+import api from "@/utils/api";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import { Alert, View } from "react-native";
@@ -22,16 +22,9 @@ type LoginResponse = {
 };
 
 const loginUser = async (data: LoginBody): Promise<LoginResponse> => {
-  const response = await axios.post<LoginResponse>(
-    "http://10.0.1.51:8000/login",
-    data,
-    {
-      headers: {
-        'accept': 'application/json',
-        'Content-Type': 'application/x-www-form-urlencoded'
-      }
-    }
-  );
+  const response = await api.post<LoginResponse>("/login", data, {
+    headers: { "Content-Type": "application/x-www-form-urlencoded" }
+  });
   return response.data;
 };
 

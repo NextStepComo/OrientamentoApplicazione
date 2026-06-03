@@ -4,7 +4,7 @@ import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/ca
 import { Text } from '@/components/ui/text';
 import { useAuth } from '@/context/AuthContext';
 import "@/global.css";
-import axios from "axios";
+import api from "@/utils/api";
 import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -40,26 +40,15 @@ export default function QuizScreen() {
   const [tutteDomande, setTutteDomande] = useState<QuizQandA[]>([]);
 
   const sendQuizData = async (data: InviaRisposta): Promise<QuizResponse> => {
-    const response = await axios.post<QuizResponse>(
-      "http://10.0.1.51:8000/acquire/quizResponses",
-      data,
-      {
-        headers: {
-          'accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      }
-    );
+    const response = await api.post<QuizResponse>("/acquire/quizResponses", data);
     return response.data;
-  }
+  };
 
   const getQuizData = async (nQ: number): Promise<QuizQandA> => {
-    const response = await axios.get<QuizQandA>(
-      `http://10.0.1.51:8000/acquire/quizQuestions?q=${nQ}`
-    );
+    const response = await api.get<QuizQandA>(`/acquire/quizQuestions?q=${nQ}`);
     return response.data;
-  }
-
+  };
+  
   useEffect(() => {
     Promise.all(
       Array.from({ length: 3 }, (_, i) => getQuizData(i + 1))

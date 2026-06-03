@@ -1,6 +1,6 @@
 // context/AuthContext.tsx
 import { User } from "@/types/user";
-import axios from "axios";
+import api from "@/utils/api";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -23,7 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
 
   const fetchUser = async (token: string) => {
-    const responseMe = await axios.get<User>("http://10.0.1.51:8000/users/me/", {
+    const responseMe = await api.get<User>("/users/me/", {
       headers: { Authorization: `Bearer ${token}` },
     });
     setUser(responseMe.data);
