@@ -33,6 +33,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(token);
     setIsAuthenticated(true);
   };
+
   const login = async (token: string, refreshToken: string): Promise<User> => {
     await SecureStore.setItemAsync("token", token);
     await SecureStore.setItemAsync("refresh_token", refreshToken);
