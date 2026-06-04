@@ -7,16 +7,16 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const NAV_ITEMS: NavItem[] = [
   {
-    id: "home",
+    id: "contenuti",
     label: "Home",
     icon: "home",
-    path: "/(protected)/(tabs)/home",       
+    path: "/(protected)/(tabs)/contenuti",
   },
   {
-    id: "contenuti",
-    label: "Contenuti",
-    icon: "menu-book",
-    path: "/(protected)/(tabs)/contenuti",
+    id: "scuole",
+    label: "Scuole",
+    icon: "school",
+    path: "/(protected)/(tabs)/scuole",       
   },
   {
     id: "mappe",

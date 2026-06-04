@@ -1,0 +1,50 @@
+[
+    {
+      "id": "1",
+      "name": "Liceo Classico G. Parini (Milano)",
+      "position": { "lat": 45.4741, "lng": 9.1892 },
+      "icon": "📍"
+    },
+    {
+      "id": "2",
+      "name": "Liceo Scientifico Paolo Frisi (Monza)",
+      "position": { "lat": 45.5804, "lng": 9.2642 },
+      "icon": "📍"
+    },
+    {
+      "id": "3",
+      "name": "Liceo Classico Paolo Sarpi (Bergamo)",
+      "position": { "lat": 45.7042, "lng": 9.6631 },
+      "icon": "📍"
+    },
+    {
+      "id": "4",
+      "name": "Liceo Scientifico Annibale Calini (Brescia)",
+      "position": { "lat": 45.5434, "lng": 10.2247 },
+      "icon": "📍"
+    },
+    {
+      "id": "5",
+      "name": "Liceo Scientifico Paolo Giovio (Como)",
+      "position": { "lat": 45.7997, "lng": 9.0975 },
+      "icon": "📍"
+    },
+    {
+      "id": "6",
+      "name": "ITT Altiero Spinelli (Sesto San Giovanni)",
+      "position": { "lat": 45.5348, "lng": 9.2311 },
+      "icon": "📍"
+    },
+    {
+      "id": "7",
+      "name": "Istituto Alessandro Volta (Pavia)",
+      "position": { "lat": 45.1961, "lng": 9.1491 },
+      "icon": "📍"
+    },
+    {
+      "id": "8",
+      "name": "Liceo Scientifico G.B. Grassi (Lecco)",
+      "position": { "lat": 45.8572, "lng": 9.3958 },
+      "icon": "📍"
+    }
+  ]

@@ -3,9 +3,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { MaterialIcons } from "@expo/vector-icons";
-import { useEffect, useRef } from "react";
-import { Animated, TouchableOpacity, View } from "react-native";
-
+import { useEffect, useRef, useState } from "react";
+import { Animated, TextInput, TouchableOpacity, View } from "react-native";
+ 
 export const colors = {
   primary:      "#066CF4",
   primaryLight: "#CCDFFD",
@@ -237,3 +237,49 @@ export function BottomNavBar({
     </View>
   );
 }
+
+interface SearchBarProps {
+  placeholder?: string;
+  onSearch: (query: string) => void;
+  onClear?: () => void;
+}
+ 
+export function SearchBar({
+  placeholder = "Cerca...",
+  onSearch,
+  onClear,
+}: SearchBarProps) {
+  const [query, setQuery] = useState("");
+ 
+  const handleChange = (text: string) => {
+    setQuery(text);
+    onSearch(text);
+  };
+ 
+  const handleClear = () => {
+    setQuery("");
+    onSearch("");
+    onClear?.();
+  };
+ 
+  return (
+    <View className="flex-row items-center bg-white border border-[#CCDFFD] rounded-2xl px-4 h-12 gap-2 shadow-sm">
+      <MaterialIcons name="search" size={20} color="#65758C" />
+      <TextInput
+        value={query}
+        onChangeText={handleChange}
+        placeholder={placeholder}
+        placeholderTextColor="#8893A7"
+        className="flex-1 text-sm text-[#0B131F] font-medium"
+        autoCapitalize="none"
+        autoCorrect={false}
+      />
+      {query.length > 0 && (
+        <TouchableOpacity onPress={handleClear} activeOpacity={0.7}>
+          <MaterialIcons name="close" size={18} color="#65758C" />
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+}
+ 
