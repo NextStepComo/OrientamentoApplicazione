@@ -23,5 +23,10 @@
       { "emoji": "⚡", "name": "Elettronica ed Elettrotecnica", "meta": "Tecnologico · più hardware", "pct": 82 },
       { "emoji": "🎬", "name": "Grafica e Comunicazione", "meta": "Tecnologico · creativo + digitale", "pct": 71 },
       { "emoji": "🔬", "name": "Scientifico — Sc. Applicate", "meta": "Liceo · matematica + informatica", "pct": 68 }
+    ],
+    "navItems": [
+      { "id": "home", "label": "Home", "icon": "home" },
+      { "id": "contenuti", "label": "Contenuti", "icon": "auto-stories" },
+      { "id": "profile", "label": "Profilo", "icon": "person" }
     ]
 }

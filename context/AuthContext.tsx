@@ -8,7 +8,7 @@ type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
   token: string | null;
-  login: (token: string, refreshToken: string) => Promise<void>;
+  login: (token: string, refreshToken: string) => Promise<User>;
   logout: () => Promise<void>;
 };
 
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   isAuthenticated: false,
   user: null,
   token: null,
-  login: async () => {},
+  login: async () => ({} as User),
   logout: async () => {},
 });
 
@@ -33,11 +33,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setToken(token);
     setIsAuthenticated(true);
   };
-
-  const login = async (token: string, refreshToken: string) => {
+  const login = async (token: string, refreshToken: string): Promise<User> => {
     await SecureStore.setItemAsync("token", token);
     await SecureStore.setItemAsync("refresh_token", refreshToken);
-    await fetchUser(token);
+    const responseMe = await api.get<User>("/users/me/", {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    setUser(responseMe.data);
+    setToken(token);
+    setIsAuthenticated(true);
+    return responseMe.data; // ← ritorna i dati freschi
   };
 
   const logout = async () => {

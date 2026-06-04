@@ -1,11 +1,56 @@
 // app/(protected)/(tabs)/_layout.tsx
+import { BottomNavBar, NavItem } from "@/components/ui/contentReusable";
 import "@/global.css";
-import { Stack } from "expo-router";
+import { router, Slot, usePathname } from "expo-router";
+import { View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+
+const NAV_ITEMS: NavItem[] = [
+  {
+    id: "home",
+    label: "Home",
+    icon: "home",
+    path: "/(protected)/(tabs)/home",       
+  },
+  {
+    id: "contenuti",
+    label: "Contenuti",
+    icon: "menu-book",
+    path: "/(protected)/(tabs)/contenuti",
+  },
+  {
+    id: "mappe",
+    label: "Mappe",
+    icon: "map",
+    path: "/(protected)/(tabs)/mappe",
+  },
+  {
+    id: "profilo",
+    label: "Profilo",
+    icon: "person",
+    path: "/(protected)/(tabs)/profilo",  
+  },
+];
 
 export default function TabsLayout() {
+  const pathname = usePathname();
+  const insets = useSafeAreaInsets();
+
+  const activeId = NAV_ITEMS.find((item) => pathname.includes(item.id))?.id ?? "home";
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="contenuti" />
-    </Stack>
+    <View style={{ flex: 1, paddingBottom: insets.bottom }}>
+      {/* Schermata attiva renderizzata qui da Expo Router */}
+      <Slot />
+
+      <BottomNavBar
+        items={NAV_ITEMS}
+        activeId={activeId}
+        onTabPress={(id) => {
+          const target = NAV_ITEMS.find((item) => item.id === id);
+          if (target) router.push(target.path as any);
+        }}
+      />
+    </View>
   );
 }

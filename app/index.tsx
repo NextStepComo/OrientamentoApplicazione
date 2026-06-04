@@ -25,23 +25,18 @@ export default function LoginScreen() {
   const [username, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const router = useRouter();
-  const { user } = useAuth();
-
+  
   const handleContinua = async () => {
-    if (!username || !password) {
-      Alert.alert("Errore", "Riempi tutti i campi");
-      return;
-    }
-
     try {
       const responseLogin = await loginUser({ username, password });
-      await login(responseLogin.access_token, responseLogin.refresh_token);
-      if (user?.quizsolved) {
+      const freshUser = await login(responseLogin.access_token, responseLogin.refresh_token);
+      
+      if (freshUser.quizsolved) {
         router.replace("/(protected)/(tabs)/contenuti");
       } else {
         router.replace("/(protected)/(modals)/quiz");
       }
-    } catch (error: any) {
+    } catch (error) {
       Alert.alert("Errore", "Login fallito, controlla le credenziali");
     }
   };
