@@ -15,12 +15,16 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-
 import quizResultData from "@/constants/quizResultData.json";
+import { useAuth } from "@/context/AuthContext";
 
 export default function ContenutiScreen() {
   const insets = useSafeAreaInsets();
   const heroStyle = useFadeSlideIn(100, 16);
+  const {rifaiQuestionario} = useAuth();
+  const handleRedoQuestionario = () => {
+    rifaiQuestionario();
+  };
 
   return (
     <View
@@ -153,7 +157,7 @@ export default function ContenutiScreen() {
             activeOpacity={0.6}
           >
             <MaterialIcons name="refresh" size={18} color="#556070" />
-            <Text className="text-sm font-bold text-[#556070]">
+            <Text className="text-sm font-bold text-[#556070]" onPress={handleRedoQuestionario}>
               Rifai il quiz di orientamento
             </Text>
           </TouchableOpacity>
