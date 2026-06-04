@@ -9,34 +9,39 @@ import { Avatar, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
-    Card,
-    CardContent,
-    CardDescription,
-    CardFooter,
-    CardHeader,
-    CardTitle
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Text } from "@/components/ui/text";
+import { useAuth } from "@/context/AuthContext";
 
 // Altezza della BottomNavBar per evitare elementi nascosti
 const NAVBAR_HEIGHT = 80;
 
 export default function ProfiloScreen() {
   const insets = useSafeAreaInsets();
+  const { user, logout, rifaiQuestionario } = useAuth();
 
   // Dati fittizi segnaposto
   const utente = {
-    nome: "Mario Rossi",
-    email: "mario.rossi@email.it",
+    nome: ""+user?.full_name,
+    email: user?.username,
     scuola: "Liceo Scientifico Paolo Frisi",
     citta: "Monza (MB)",
-    questionarioCompletato: true,
+    questionarioCompletato: user?.quizsolved,
     dataCompilazione: "28/05/2026",
   };
 
   const handleLogout = () => {
-    console.log("Logout effettuato");
+    logout();
+  };
+  const handleRedoQuestionario = () => {
+    rifaiQuestionario();
   };
 
   return (
@@ -148,10 +153,10 @@ export default function ProfiloScreen() {
                 variant="outline" 
                 style={{ backgroundColor: "#E6F0FE", borderColor: "#CCDFFD" }}
                 className="w-full rounded-xl h-11"
-                onPress={() => console.log("Naviga al questionario")}
+                onPress={handleRedoQuestionario}
               >
                 <Text className="text-[#066CF4] font-black">
-                  {utente.questionarioCompletato ? "Visualizza risposte" : "Inizia ora"}
+                  {utente.questionarioCompletato ? "Rifai il test" : "Inizia ora"}
                 </Text>
               </Button>
             </CardFooter>

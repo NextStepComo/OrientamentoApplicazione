@@ -1,6 +1,7 @@
 // context/AuthContext.tsx
 import { User } from "@/types/user";
 import api from "@/utils/api";
+import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
@@ -10,6 +11,7 @@ type AuthContextType = {
   token: string | null;
   login: (token: string, refreshToken: string) => Promise<User>;
   logout: () => Promise<void>;
+  rifaiQuestionario: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -18,6 +20,7 @@ const AuthContext = createContext<AuthContextType>({
   token: null,
   login: async () => ({} as User),
   logout: async () => {},
+  rifaiQuestionario: async () => {}
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -52,7 +55,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
     setToken(null);
     setIsAuthenticated(false);
+    router.push("/");
   };
+
+  const rifaiQuestionario = async () => {
+    if(!user){
+      router.push("/"); 
+      return;
+    }
+    const fresh_user : User = user;
+    fresh_user.quizsolved = false;
+    setUser(fresh_user);
+    router.push("/(protected)/(modals)/quiz")
+  }
 
   useEffect(() => {
     const checkToken = async () => {
@@ -69,7 +84,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, rifaiQuestionario }}>
       {children}
     </AuthContext.Provider>
   );

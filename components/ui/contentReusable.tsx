@@ -4,7 +4,7 @@ import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
-import { Animated, TextInput, TouchableOpacity, View } from "react-native";
+import { Animated, Keyboard, TextInput, TouchableOpacity, View } from "react-native"; // Importato Keyboard qui
  
 export const colors = {
   primary:      "#066CF4",
@@ -260,6 +260,7 @@ export function SearchBar({
     setQuery("");
     onSearch("");
     onClear?.();
+    Keyboard.dismiss(); // Chiude la tastiera se l'utente svuota la barra col tasto "X"
   };
  
   return (
@@ -273,6 +274,10 @@ export function SearchBar({
         className="flex-1 text-sm text-[#0B131F] font-medium"
         autoCapitalize="none"
         autoCorrect={false}
+        returnKeyType="search" // Trasforma il pulsante "Invio" della tastiera in un tasto blu "Cerca"
+        onSubmitEditing={() => {
+          Keyboard.dismiss(); // Forza la chiusura della tastiera quando si preme Invio/Cerca
+        }}
       />
       {query.length > 0 && (
         <TouchableOpacity onPress={handleClear} activeOpacity={0.7}>
@@ -282,4 +287,3 @@ export function SearchBar({
     </View>
   );
 }
- 
