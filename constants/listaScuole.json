@@ -3,48 +3,112 @@
       "id": "1",
       "name": "Liceo Classico G. Parini (Milano)",
       "position": { "lat": 45.4741, "lng": 9.1892 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Classico",
+      "descrizione": "Uno dei licei classici più prestigiosi di Milano, il G. Parini forma studenti con una solida base umanistica, letteraria e filosofica. Fondato nell'800, è sinonimo di eccellenza e rigore accademico nel cuore della città.",
+      "corsi": ["Classico", "Scienze Umane", "Linguistico"],
+      "studenti": "1.200",
+      "fondazione": "1860",
+      "indirizzo": "Via Goito 4, Milano",
+      "sito": "liceoclassicoparini.edu.it"
     },
     {
       "id": "2",
       "name": "Liceo Scientifico Paolo Frisi (Monza)",
       "position": { "lat": 45.5804, "lng": 9.2642 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Scientifico",
+      "descrizione": "Il Liceo Frisi di Monza è un punto di riferimento per chi vuole intraprendere studi scientifici, con un'offerta formativa moderna e laboratori all'avanguardia.",
+      "corsi": ["Scientifico", "Scientifico Sportivo", "STEM Potenziato"],
+      "studenti": "980",
+      "fondazione": "1954",
+      "indirizzo": "Via Bramante 8, Monza",
+      "sito": "liceofrisimb.edu.it"
     },
     {
       "id": "3",
       "name": "Liceo Classico Paolo Sarpi (Bergamo)",
       "position": { "lat": 45.7042, "lng": 9.6631 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Classico",
+      "descrizione": "Storico liceo bergamasco, il Paolo Sarpi è uno dei più antichi istituti della Lombardia. Offre un percorso classico rigoroso immerso nel fascino della città alta.",
+      "corsi": ["Classico", "Classico Europeo", "Linguistico"],
+      "studenti": "850",
+      "fondazione": "1791",
+      "indirizzo": "Piazza Rosate 4, Bergamo",
+      "sito": "liceosarpi.bg.it"
     },
     {
       "id": "4",
       "name": "Liceo Scientifico Annibale Calini (Brescia)",
       "position": { "lat": 45.5434, "lng": 10.2247 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Scientifico",
+      "descrizione": "Il Calini di Brescia vanta una lunga traditione scientifica e umanistica, con un corpo docente qualificato e un'ampia offerta di attività extracurricolari.",
+      "corsi": ["Scientifico", "Classico", "Linguistico"],
+      "studenti": "1.100",
+      "fondazione": "1923",
+      "indirizzo": "Via Trieste 6, Brescia",
+      "sito": "liceocalini.it"
     },
     {
       "id": "5",
       "name": "Liceo Scientifico Paolo Giovio (Como)",
       "position": { "lat": 45.7997, "lng": 9.0975 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Scientifico",
+      "descrizione": "Situato nel centro di Como, il Liceo Giovio unisce tradizione e innovazione didattica, preparando gli studenti per le sfide dell'università e del mondo del lavoro.",
+      "corsi": ["Scientifico", "Scienze Applicate", "Bilingue"],
+      "studenti": "760",
+      "fondazione": "1912",
+      "indirizzo": "Via Luini 11, Como",
+      "sito": "liceogioviocomo.edu.it"
     },
     {
       "id": "6",
       "name": "ITT Altiero Spinelli (Sesto San Giovanni)",
       "position": { "lat": 45.5348, "lng": 9.2311 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Istituto Tecnico Tecnologico",
+      "descrizione": "L'ITT Spinelli è uno dei principali istituti tecnici dell'hinterland milanese, con indirizzi in informatica, elettronica e meccanica orientati al mercato del lavoro.",
+      "corsi": ["Informatica", "Elettronica", "Meccanica", "Automazione"],
+      "studenti": "1.350",
+      "fondazione": "1968",
+      "indirizzo": "Via Leopardi 132, Sesto San Giovanni",
+      "sito": "ittspinelli.edu.it"
     },
     {
       "id": "7",
       "name": "Istituto Alessandro Volta (Pavia)",
       "position": { "lat": 45.1961, "lng": 9.1491 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Istituto Tecnico",
+      "descrizione": "L'Istituto Volta di Pavia è un'eccellenza lombarda nella formazione tecnica e scientifica, con laboratori di fisica, chimica e informatica sempre aggiornati.",
+      "corsi": ["Elettrotecnica", "Informatica", "Chimica", "Liceo Scientifico"],
+      "studenti": "900",
+      "fondazione": "1878",
+      "indirizzo": "Corso Strada Nuova 65, Pavia",
+      "sito": "voltapavia.edu.it"
     },
     {
       "id": "8",
       "name": "Liceo Scientifico G.B. Grassi (Lecco)",
       "position": { "lat": 45.8572, "lng": 9.3958 },
-      "icon": "📍"
+      "icon": "📍",
+      "image": "https://images.unsplash.com/photo-1541339907198-e08756dedf3f?q=80&w=600&auto=format&fit=crop",
+      "tipo": "Liceo Scientifico",
+      "descrizione": "Il Liceo Grassi di Lecco si distingue per la qualità dell'insegnamento scientifico e per i suoi ottimi risultati nelle olimpiadi di matematica e fisica a livello nazionale.",
+      "corsi": ["Scientifico", "Scienze Applicate", "STEM"],
+      "studenti": "670",
+      "fondazione": "1948",
+      "indirizzo": "Via Zelioli 16, Lecco",
+      "sito": "liceograssi.it"
     }
   ]
