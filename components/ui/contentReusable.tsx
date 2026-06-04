@@ -2,10 +2,10 @@
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { Text } from "@/components/ui/text";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { Animated, Keyboard, TextInput, TouchableOpacity, View } from "react-native"; // Importato Keyboard qui
- 
+
 export const colors = {
   primary:      "#066CF4",
   primaryLight: "#CCDFFD",
@@ -140,7 +140,7 @@ export function StatCard({
 }) {
   return (
     <Card className="flex-1 items-center bg-white border border-[#CCDFFD] rounded-2xl p-3 shadow-sm">
-      <MaterialIcons name={icon as any} size={20} color={colors.primary} />
+      <MaterialCommunityIcons name={icon as any} size={20} color={colors.primary} />
       <Text className="text-lg font-black text-[#0B131F] mt-1 tracking-tight">
         {value}
       </Text>
@@ -181,7 +181,7 @@ export function SectionTitle({
 }) {
   return (
     <View className="flex-row items-center gap-2 mb-3 mt-1">
-      <MaterialIcons name={icon as any} size={18} color={colors.primary} />
+      <MaterialCommunityIcons name={icon as any} size={18} color={colors.primary} />
       <Text className="text-base font-black text-[#0B131F] flex-1 tracking-tight">
         {title}
       </Text>
@@ -216,7 +216,7 @@ export function BottomNavBar({
             className="flex-1 items-center justify-center h-full"
           >
             <View className="items-center justify-center gap-1">
-              <MaterialIcons
+              <MaterialCommunityIcons
                 name={item.icon as any}
                 size={22}
                 color={isActive ? colors.primary : colors.textMid}
@@ -265,7 +265,7 @@ export function SearchBar({
  
   return (
     <View className="flex-row items-center bg-white border border-[#CCDFFD] rounded-2xl px-4 h-12 gap-2 shadow-sm">
-      <MaterialIcons name="search" size={20} color="#65758C" />
+      <MaterialCommunityIcons name="magnify" size={20} color="#65758C" />
       <TextInput
         value={query}
         onChangeText={handleChange}
@@ -281,7 +281,7 @@ export function SearchBar({
       />
       {query.length > 0 && (
         <TouchableOpacity onPress={handleClear} activeOpacity={0.7}>
-          <MaterialIcons name="close" size={18} color="#65758C" />
+          <MaterialCommunityIcons name="close-circle" size={18} color="#65758C" />
         </TouchableOpacity>
       )}
     </View>

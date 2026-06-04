@@ -19,6 +19,12 @@ const NAV_ITEMS: NavItem[] = [
     path: "/(protected)/(tabs)/scuole",       
   },
   {
+    id: "chat",
+    label: "NextStep Bot",
+    icon: "robot",
+    path: "/(protected)/(tabs)/chat",       
+  },
+  {
     id: "mappe",
     label: "Mappe",
     icon: "map",
@@ -27,7 +33,7 @@ const NAV_ITEMS: NavItem[] = [
   {
     id: "profilo",
     label: "Profilo",
-    icon: "person",
+    icon: "account",
     path: "/(protected)/(tabs)/profilo",  
   },
 ];

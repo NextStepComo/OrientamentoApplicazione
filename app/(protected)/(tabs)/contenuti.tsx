@@ -59,7 +59,7 @@ export default function ContenutiScreen() {
         </Animated.View>
 
         {/* ── MATCH CON IL PROFILO ── */}
-        <Section icon="bar-chart" title="Match con il tuo profilo">
+        <Section icon="chart-bar" title="Match con il tuo profilo">
           <Card className="bg-white border border-[#CCDFFD] p-4 rounded-2xl shadow-sm">
             {quizResultData.matchBars.map((b) => (
               <MatchBar
@@ -83,7 +83,7 @@ export default function ContenutiScreen() {
         </Section>
 
         {/* ── PERCHÉ QUESTO INDIRIZZO ── */}
-        <Section icon="info" title="Perché questo indirizzo">
+        <Section icon="information" title="Perché questo indirizzo">
           <Card className="bg-[#E6F0FE] border border-[#CCDFFD]/60 p-4 rounded-2xl">
             <Text className="text-sm text-[#334155] font-medium leading-relaxed">
               {quizResultData.description}
@@ -93,7 +93,7 @@ export default function ContenutiScreen() {
 
         {/* ── MATERIE PRINCIPALI ── */}
         <Section
-          icon="menu-book"
+          icon="book-open-variant"
           title="Materie principali"
           count={`${quizResultData.subjects.length} materie`}
         >
@@ -110,7 +110,7 @@ export default function ContenutiScreen() {
         </Section>
 
         {/* ── SBOCCHI PROFESSIONALI ── */}
-        <Section icon="badge" title="Sbocchi professionali">
+        <Section icon="id-card" title="Sbocchi professionali">
           <View className="flex-row flex-wrap gap-2">
             {quizResultData.jobs.map((j) => (
               <Badge
