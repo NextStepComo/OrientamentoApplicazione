@@ -117,6 +117,7 @@ export default function MappeScreen() {
         mapMarkers={filteredMarkers.length > 0 ? filteredMarkers : allMarkers}
         zoomControl={false}
         attributionControl={false}
+        doDebug={false}
         onMessageReceived={handleMapMessage}
         mapLayers={[{
           attribution: '&copy; JawgMaps &copy; OpenStreetMap contributors',
