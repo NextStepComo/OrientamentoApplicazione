@@ -12,7 +12,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 const DEFAULT_LOCATION: LatLng = { lat: 45.4741, lng: 9.1892 };
 
 const toMarker = (scuola: any): MapMarker => ({
-  id: scuola.id,
+  id: scuola.name,
   position: scuola.position,
   title: scuola.name,
   icon: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -48,7 +48,7 @@ export default function MappeScreen() {
       });
   }, []);
 
-  const allMarkers: MapMarker[] = useMemo(() => listaScuole.map(toMarker), []);
+  const allMarkers = useMemo(() => listaScuole.map(toMarker), [listaScuole]);
 
 
   
@@ -63,7 +63,7 @@ export default function MappeScreen() {
   const handleMapMessage = (message: WebviewLeafletMessage) => {
     const id = message.payload?.mapMarkerID;
     if (message.event === WebViewLeafletEvents.ON_MAP_MARKER_CLICKED && id) {
-      const scuola = listaScuole.find(s => s.id === id);
+      const scuola = listaScuole.find(s => s.name === id);
       if (scuola) selectScuola(scuola);
     }
   };
@@ -92,7 +92,7 @@ export default function MappeScreen() {
           <View className="mt-1 bg-white border border-[#CCDFFD] rounded-2xl overflow-hidden shadow-md">
             <FlatList
               data={suggestions}
-              keyExtractor={(item: any) => item.id}
+              keyExtractor={(item: any) => item.name}
               scrollEnabled={suggestions.length > 4}
               style={{ maxHeight: 220 }}
               keyboardShouldPersistTaps="handled"
@@ -171,7 +171,7 @@ export default function MappeScreen() {
 
             <TouchableOpacity
               activeOpacity={0.85}
-              onPress={() => router.push({ pathname: "/(protected)/(tabs)/scuole", params: { id: selectedScuola.id } })}
+              onPress={() => router.push({ pathname: "/(protected)/(tabs)/scuole", params: { id: selectedScuola.name } })}
               className="bg-[#066CF4] rounded-2xl h-12 flex-row items-center justify-center gap-2"
             >
               <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
