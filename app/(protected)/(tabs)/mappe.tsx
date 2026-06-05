@@ -30,7 +30,7 @@ export default function MappeScreen() {
   const [listaScuole, setListaScuole] = useState<any[]>([]);
   
   useEffect(() => {
-    api.get("/acquire/scuolePosizione?provincia=MI")
+    api.get("/acquire/scuolePosizione?provincia=XX")
     .then(res => {
       const scuole = res.data.map((s: any) => ({
         name: s.denominazione_sede_direttivo,
@@ -49,8 +49,6 @@ export default function MappeScreen() {
   }, []);
 
   const allMarkers = useMemo(() => listaScuole.map(toMarker), [listaScuole]);
-
-
   
   const selectScuola = (scuola: any) => {
     setMapCenter({ lat: scuola.position.lat, lng: scuola.position.lng });

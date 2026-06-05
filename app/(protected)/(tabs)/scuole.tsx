@@ -2,13 +2,12 @@
 import { SearchBar, Section, SectionTitle, StatCard } from "@/components/ui/contentReusable";
 import { Text } from "@/components/ui/text";
 import listaScuole from "@/constants/listaScuole.json";
-import { MaterialCommunityIcons } from "@expo/vector-icons"; // Cambiato in MaterialCommunityIcons
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-// Altezza stimata della BottomNavBar per evitare che copra i contenuti in fondo
 const NAVBAR_HEIGHT = 80;
 
 const DEFAULT_EXTRA = {
