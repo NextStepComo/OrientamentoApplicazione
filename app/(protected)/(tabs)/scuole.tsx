@@ -2,7 +2,7 @@
 import { SearchBar, Section, SectionTitle, StatCard } from "@/components/ui/contentReusable";
 import { Text } from "@/components/ui/text";
 import listaScuole from "@/constants/listaScuole.json";
-import { MaterialIcons } from "@expo/vector-icons";
+import { MaterialCommunityIcons } from "@expo/vector-icons"; // Cambiato in MaterialCommunityIcons
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, FlatList, ScrollView, TouchableOpacity, View } from "react-native";
@@ -96,7 +96,6 @@ export default function ScuoleScreen() {
       <View style={{ flex: 1, backgroundColor: "#F5F7FA", paddingTop: insets.top }}>
         <ScrollView 
           showsVerticalScrollIndicator={false} 
-          // Aggiunge spazio extra in fondo pari all'altezza della navbar + margine
           contentContainerStyle={{ paddingBottom: NAVBAR_HEIGHT + 24 }}
         >
 
@@ -107,13 +106,14 @@ export default function ScuoleScreen() {
               activeOpacity={0.7}
               className="flex-row items-center gap-1.5 mb-5"
             >
-              <MaterialIcons name="arrow-back" size={20} color="#FFFFFF" />
+              {/* arrow-back -> arrow-left */}
+              <MaterialCommunityIcons name="arrow-left" size={20} color="#FFFFFF" />
               <Text className="text-white text-sm font-bold">Tutte le scuole</Text>
             </TouchableOpacity>
 
             <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
               <View className="w-14 h-14 rounded-2xl bg-white/20 items-center justify-center mb-3">
-                <MaterialIcons name="school" size={28} color="#FFFFFF" />
+                <MaterialCommunityIcons name="school" size={28} color="#FFFFFF" />
               </View>
               <Text className="text-2xl font-black text-white leading-tight mb-1">
                 {scuola.name}
@@ -123,7 +123,8 @@ export default function ScuoleScreen() {
                   <Text className="text-xs font-bold text-white">{extra.tipo}</Text>
                 </View>
                 <View className="px-2.5 py-1 bg-white/20 rounded-full flex-row items-center gap-1">
-                  <MaterialIcons name="location-on" size={11} color="rgba(255,255,255,0.85)" />
+                  {/* location-on -> map-marker */}
+                  <MaterialCommunityIcons name="map-marker" size={11} color="rgba(255,255,255,0.85)" />
                   <Text className="text-xs font-bold text-white/85">
                     {extra.indirizzo.split(",")[1]?.trim() ?? "—"}
                   </Text>
@@ -137,14 +138,16 @@ export default function ScuoleScreen() {
             style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}
             className="flex-row gap-3 mx-4 -mt-5 mb-2"
           >
-            <StatCard icon="people" value={extra.studenti} label="Studenti" />
-            <StatCard icon="history-edu" value={extra.fondazione} label="Fondazione" />
-            <StatCard icon="menu-book" value={String(extra.corsi.length || "—")} label="Indirizzi" />
+            {/* Corretti i nomi delle icone interne passate a StatCard */}
+            <StatCard icon="account-group" value={extra.studenti} label="Studenti" />
+            <StatCard icon="history" value={extra.fondazione} label="Fondazione" />
+            <StatCard icon="book-open-variant" value={String(extra.corsi.length || "—")} label="Indirizzi" />
           </Animated.View>
 
           {/* Descrizione */}
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-            <Section icon="info-outline" title="Chi siamo">
+            {/* info-outline -> information-outline */}
+            <Section icon="information-outline" title="Chi siamo">
               <View className="bg-white border border-[#CCDFFD] rounded-2xl p-4 shadow-sm">
                 <Text className="text-sm text-[#334155] leading-relaxed">
                   {extra.descrizione}
@@ -156,7 +159,8 @@ export default function ScuoleScreen() {
           {/* Corsi / Indirizzi */}
           {extra.corsi.length > 0 && (
             <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-              <Section icon="class" title="Indirizzi di studio">
+              {/* class -> google-classroom */}
+              <Section icon="google-classroom" title="Indirizzi di studio">
                 <View className="flex-row flex-wrap gap-2">
                   {extra.corsi.map((corso: string, i: number) => {
                     const c = CORSO_COLORS[i % CORSO_COLORS.length];
@@ -179,19 +183,20 @@ export default function ScuoleScreen() {
 
           {/* Info pratiche */}
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-            <Section icon="place" title="Informazioni pratiche">
+            {/* place -> map-marker-outline */}
+            <Section icon="map-marker-outline" title="Informazioni pratiche">
               <View className="bg-white border border-[#CCDFFD] rounded-2xl overflow-hidden shadow-sm">
                 {[
-                  { icon: "location-on", label: "Indirizzo", value: extra.indirizzo },
-                  { icon: "language",    label: "Sito web",  value: extra.sito },
-                  { icon: "my-location", label: "Coordinate", value: `${scuola.position.lat.toFixed(4)}, ${scuola.position.lng.toFixed(4)}` },
+                  { icon: "map-marker", label: "Indirizzo", value: extra.indirizzo },
+                  { icon: "earth",      label: "Sito web",  value: extra.sito },
+                  { icon: "crosshairs-gps", label: "Coordinate", value: `${scuola.position.lat.toFixed(4)}, ${scuola.position.lng.toFixed(4)}` },
                 ].map((row, i, arr) => (
                   <View
                     key={i}
                     className={`flex-row items-center gap-3 px-4 py-3.5 ${i < arr.length - 1 ? "border-b border-[#CCDFFD]" : ""}`}
                   >
                     <View className="w-8 h-8 rounded-xl bg-[#E6F0FE] items-center justify-center">
-                      <MaterialIcons name={row.icon as any} size={16} color="#066CF4" />
+                      <MaterialCommunityIcons name={row.icon as any} size={16} color="#066CF4" />
                     </View>
                     <View className="flex-1">
                       <Text className="text-[10px] font-bold text-[#65758C] uppercase tracking-wide">{row.label}</Text>
@@ -210,7 +215,7 @@ export default function ScuoleScreen() {
               onPress={() => router.push("/(protected)/(tabs)/mappe")}
               className="bg-white border border-[#CCDFFD] rounded-2xl h-12 flex-row items-center justify-center gap-2 shadow-sm"
             >
-              <MaterialIcons name="map" size={18} color="#066CF4" />
+              <MaterialCommunityIcons name="map" size={18} color="#066CF4" />
               <Text className="text-[#066CF4] text-sm font-black">Vedi sulla mappa</Text>
             </TouchableOpacity>
           </Animated.View>
@@ -240,7 +245,7 @@ export default function ScuoleScreen() {
       {/* Contatore risultati */}
       <View className="px-4 mb-2">
         <SectionTitle
-          icon="list"
+          icon="format-list-bulleted"
           title="Tutti gli istituti"
           count={`${filteredList.length}`}
         />
@@ -250,7 +255,6 @@ export default function ScuoleScreen() {
       <FlatList
         data={filteredList}
         keyExtractor={(item: any) => item.id}
-        // Il paddingBottom qui spinge l'ultimo elemento sopra la barra quando si scrolla fino alla fine
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: NAVBAR_HEIGHT + 16 }}
         showsVerticalScrollIndicator={false}
         ItemSeparatorComponent={() => <View style={{ height: 10 }} />}
@@ -266,7 +270,7 @@ export default function ScuoleScreen() {
             >
               <View className="flex-row items-center gap-3">
                 <View className="w-11 h-11 rounded-xl bg-[#E6F0FE] items-center justify-center">
-                  <MaterialIcons name="school" size={22} color="#066CF4" />
+                  <MaterialCommunityIcons name="school" size={22} color="#066CF4" />
                 </View>
 
                 <View className="flex-1">
@@ -276,7 +280,7 @@ export default function ScuoleScreen() {
                   <Text className="text-xs text-[#65758C] mt-0.5">{tipoScuola}</Text>
                 </View>
 
-                <MaterialIcons name="chevron-right" size={20} color="#CCDFFD" />
+                <MaterialCommunityIcons name="chevron-right" size={20} color="#CCDFFD" />
               </View>
 
               {/* Badge corsi */}

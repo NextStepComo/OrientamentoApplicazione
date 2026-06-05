@@ -5,6 +5,8 @@ import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 import { createContext, ReactNode, useContext, useEffect, useState } from "react";
 
+type RegisterResponse = { access_token: string; refresh_token: string; token_type: string; };
+
 type AuthContextType = {
   isAuthenticated: boolean;
   user: User | null;
@@ -12,6 +14,7 @@ type AuthContextType = {
   login: (token: string, refreshToken: string) => Promise<User>;
   logout: () => Promise<void>;
   rifaiQuestionario: () => Promise<void>;
+  register: (data: User) => Promise<RegisterResponse>;
 };
 
 const AuthContext = createContext<AuthContextType>({
@@ -20,7 +23,8 @@ const AuthContext = createContext<AuthContextType>({
   token: null,
   login: async () => ({} as User),
   logout: async () => {},
-  rifaiQuestionario: async () => {}
+  rifaiQuestionario: async () => {},
+  register: async () => ({} as RegisterResponse)
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -46,9 +50,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(responseMe.data);
     setToken(token);
     setIsAuthenticated(true);
-    return responseMe.data; // ← ritorna i dati freschi
+    return responseMe.data; 
   };
 
+  const register = async (data: User): Promise<RegisterResponse> => {
+    const response = await api.post<RegisterResponse>("/register", data);
+    return response.data;
+  };
+  
   const logout = async () => {
     await SecureStore.deleteItemAsync("token");
     await SecureStore.deleteItemAsync("refresh_token");
@@ -57,6 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setIsAuthenticated(false);
     router.push("/");
   };
+
 
   const rifaiQuestionario = async () => {
     if(!user){
@@ -84,7 +94,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, rifaiQuestionario }}>
+    <AuthContext.Provider value={{ isAuthenticated, user, token, login, logout, rifaiQuestionario, register }}>
       {children}
     </AuthContext.Provider>
   );

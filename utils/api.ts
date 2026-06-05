@@ -1,5 +1,6 @@
 // utils/api.ts
 import axios from "axios";
+import { router } from "expo-router";
 import * as SecureStore from "expo-secure-store";
 
 const api = axios.create({
@@ -18,32 +19,32 @@ api.interceptors.request.use(async (config) => {
 });
 
 api.interceptors.response.use(
-    (response) => response,
-    async (error) => {
-      const original = error.config;
-      if (error.response?.status === 401 && !original._retry) {
-        original._retry = true;
-        try {
-          const refreshToken = await SecureStore.getItemAsync("refresh_token");
-          const response = await axios.post("http://10.0.1.51:8000/refresh", {}, {
-            headers: {
-              Authorization: `Bearer ${refreshToken}`
-            }
-          });
-          const { access_token, refresh_token } = response.data;
-          await SecureStore.setItemAsync("token", access_token);
-          if (refresh_token) {
-            await SecureStore.setItemAsync("refresh_token", refresh_token);
-          }          
-          original.headers.Authorization = `Bearer ${access_token}`;
-          return api(original);
-        } catch {
-          await SecureStore.deleteItemAsync("token");
-          await SecureStore.deleteItemAsync("refresh_token");
+  (response) => response,
+  async (error) => {
+    const original = error.config;
+    if (error.response?.status === 401 && !original._retry) {
+      original._retry = true;
+      try {
+        const refreshToken = await SecureStore.getItemAsync("refresh_token");
+        const response = await axios.post("http://10.0.1.51:8000/refresh",
+          { refresh_token: refreshToken },
+          { headers: { "Content-Type": "application/json" } }
+        );
+        const { access_token, refresh_token } = response.data;
+        await SecureStore.setItemAsync("token", access_token);
+        if (refresh_token) {
+          await SecureStore.setItemAsync("refresh_token", refresh_token);
         }
+        original.headers.Authorization = `Bearer ${access_token}`;
+        return api(original);
+      } catch {
+        await SecureStore.deleteItemAsync("token");
+        await SecureStore.deleteItemAsync("refresh_token");
+        router.replace("/"); 
       }
-      return Promise.reject(error);
     }
-  );
-  
-  export default api;
+    return Promise.reject(error);
+  }
+);
+
+export default api;

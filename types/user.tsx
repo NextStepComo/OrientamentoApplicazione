@@ -1,7 +1,8 @@
 export type User = {
-  userid : number,
+  userid? : number,
   username: string,
   full_name: string,
   quizsolved: boolean,
-  date_birth: Date 
+  date_birth: string,
+  password?: string
 };
