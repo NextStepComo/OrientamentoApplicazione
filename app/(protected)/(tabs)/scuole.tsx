@@ -140,6 +140,16 @@ export default function ScuoleScreen() {
 
   const activeFilters = [selectedProvincia, selectedIndirizzo].filter(Boolean).length;
 
+  const getSchoolIcon = (s:any) => {
+    if(s[0].slice(0,3) == 'I.P'){
+      return "tools";
+    }else if(s[0].slice(0,3) == 'I.T'){
+      return "cogs";
+    }else{
+      return "school";
+    }
+  } 
+
   // ── Loading ───────────────────────────────────────────────────
   if (loading && selectedId) {
     return (
@@ -355,7 +365,7 @@ export default function ScuoleScreen() {
             >
               <View className="flex-row items-center gap-3">
                 <View className="w-11 h-11 rounded-xl bg-[#E6F0FE] items-center justify-center">
-                  <MaterialCommunityIcons name="school" size={22} color="#066CF4" />
+                  <MaterialCommunityIcons name={getSchoolIcon(corsiScuola)} size={22} color="#066CF4" />
                 </View>
                 <View className="flex-1">
                   <Text className="text-sm font-black text-[#0B131F] leading-snug" numberOfLines={2}>{item?.name}</Text>
