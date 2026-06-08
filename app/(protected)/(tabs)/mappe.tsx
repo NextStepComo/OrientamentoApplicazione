@@ -3,7 +3,7 @@ import { SearchBar } from "@/components/ui/contentReusable";
 import { Text } from "@/components/ui/text";
 import api from "@/utils/api";
 import { MaterialIcons } from "@expo/vector-icons";
-import { router } from "expo-router";
+import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, FlatList, ScrollView, TouchableOpacity, View } from "react-native";
 import { LatLng, LeafletView, MapMarker, WebViewLeafletEvents, WebviewLeafletMessage } from 'react-native-leaflet-view';
@@ -22,17 +22,26 @@ const toMarker = (scuola: any): MapMarker => ({
 
 export default function MappeScreen() {
   const insets = useSafeAreaInsets();
-  const [mapCenter, setMapCenter] = useState<LatLng>(DEFAULT_LOCATION);
   const [suggestions, setSuggestions] = useState<any[]>([]);
   const [filteredMarkers, setFilteredMarkers] = useState<MapMarker[]>([]);
   const [selectedScuola, setSelectedScuola] = useState<any | null>(null);
   const cardAnim = useRef(new Animated.Value(0)).current;
   const [listaScuole, setListaScuole] = useState<any[]>([]);
+  const { lat, lng, zoom } = useLocalSearchParams<{ lat?: string; lng?: string; zoom?: string }>();
   
+  const [mapCenter, setMapCenter] = useState<LatLng>(
+    lat && lng 
+      ? { lat: parseFloat(lat), lng: parseFloat(lng) }
+      : DEFAULT_LOCATION
+  );
   useEffect(() => {
+    if (lat && lng) {
+      setMapCenter({ lat: parseFloat(lat), lng: parseFloat(lng) });
+    }
     api.get("/acquire/scuolePosizione?provincia=XX")
     .then(res => {
       const scuole = res.data.map((s: any) => ({
+        id: s.denominazione_sede_direttivo,   
         name: s.denominazione_sede_direttivo,
         position: {
           lat: parseFloat(s.coory),
@@ -46,7 +55,7 @@ export default function MappeScreen() {
         console.log("Detail:", err.response?.data);
         console.log("URL:", err.config?.url);
       });
-  }, []);
+  }, [lat, lng]);
 
   const allMarkers = useMemo(() => listaScuole.map(toMarker), [listaScuole]);
   
@@ -113,7 +122,7 @@ export default function MappeScreen() {
       {/* Mappa */}
       <LeafletView
         mapCenterPosition={mapCenter}
-        zoom={12}
+        zoom={zoom ? parseInt(zoom) : 12}
         mapMarkers={filteredMarkers.length > 0 ? filteredMarkers : allMarkers}
         zoomControl={false}
         attributionControl={false}
@@ -170,7 +179,7 @@ export default function MappeScreen() {
 
             <TouchableOpacity
               activeOpacity={0.85}
-              onPress={() => router.push({ pathname: "/(protected)/(tabs)/scuole", params: { id: selectedScuola.name } })}
+              onPress={() => router.push({ pathname: "/(protected)/(tabs)/scuole", params: { id: selectedScuola.id } })}
               className="bg-[#066CF4] rounded-2xl h-12 flex-row items-center justify-center gap-2"
             >
               <MaterialIcons name="arrow-forward" size={18} color="#FFFFFF" />
