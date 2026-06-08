@@ -6,8 +6,8 @@ import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, FlatList, Modal, ScrollView, TouchableOpacity, View } from "react-native";
+import { Calendar } from 'react-native-calendars';
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-
 const NAVBAR_HEIGHT = 80;
 
 const DEFAULT_EXTRA = {
@@ -45,6 +45,42 @@ export default function ScuoleScreen() {
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(24)).current;
+  const [dateString, setDateString] = useState<string>('');
+  const [dateStringMark1, setDateStringMark1] = useState<string>('');
+  const [dateStringMark2, setDateStringMark2] = useState<string>('');
+
+  //DATA DI OGGI PER CALENDARIO
+  useEffect(() => {
+    const today = new Date();
+  
+    const formatted = new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(today);
+  
+    setDateString(formatted); // Outputs exactly "2026-06-08" using local time
+
+    const date1 = new Date();
+    date1.setDate(date1.getDate() + 5);
+    const formatted1 = new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date1);
+  
+    setDateStringMark1(formatted1);
+
+    const date2 = new Date();
+    date2.setDate(date2.getDate() + 13);
+    const formatted2 = new Intl.DateTimeFormat('en-CA', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit'
+    }).format(date2);
+  
+    setDateStringMark2(formatted2);
+  }, []);
 
   useEffect(() => {
     if (id) setSelectedId(id);
@@ -217,6 +253,28 @@ export default function ScuoleScreen() {
               </Section>
             </Animated.View>
           )}
+
+          <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
+            <Section icon="human-handsup" title="Open Days">
+              <View className="bg-white border border-[#CCDFFD] rounded-2xl p-4 shadow-sm">
+              <Calendar
+                style={{
+                  borderWidth: 1,
+                  borderColor: 'white',
+                  height: 350
+                }}
+                current={dateString}
+                onDayPress={day => {
+                  console.log('selected day', day);
+                }}
+                markedDates={{
+                  [dateStringMark1]: {selected: true, marked: true, selectedColor: 'orange'},
+                  [dateStringMark2]: {selected: true, marked: true, selectedColor: 'red'}
+                }}
+              />  
+            </View>
+            </Section>
+          </Animated.View>
 
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
             <Section icon="map-marker-outline" title="Informazioni pratiche">
