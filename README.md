@@ -46,6 +46,7 @@ L'app permette agli studenti di:
 | **Linguaggio** | TypeScript 5.9 |
 | **HTTP Client** | Axios (con interceptor JWT e refresh token automatico) |
 | **UI Primitives** | @rn-primitives (Avatar, Checkbox, Label, Progress, RadioGroup, Separator, Slot) |
+| **Storage Locale** | @react-native-async-storage/async-storage (cronologia ricerca mappe) |
 | **Icone** | Lucide React Native, @expo/vector-icons (MaterialCommunityIcons, MaterialIcons) |
 | **Mappe** | react-native-leaflet-view (Leaflet + MapTiler via WebView) |
 | **Calendario** | react-native-calendars (Open Days) |
@@ -268,6 +269,16 @@ Base URL: `http://10.0.1.51:8000`
 | `/acquire/scuolePosizione?provincia={XX}` | GET | Elenco scuole con coordinate geografiche |
 | `/acquire/chat` | POST | Invia messaggio al chatbot AI (`{ inputText }`) |
 
+### Cronologia Ricerca Mappe (`mappe.tsx`)
+
+L'ultima commit ha introdotto il salvataggio persistente delle ultime 5 scuole cercate sulla mappa:
+
+- **Storage:** `@react-native-async-storage/async-storage` con chiave `@cache_scuole_selezionate`
+- **Cache:** caricata all'avvio della schermata e salvata automaticamente a ogni modifica
+- **UI:** tag chips orizzontali con icona "history" che appaiono sotto la searchbar quando non ci sono suggerimenti attivi
+- **Logica:** ogni scuola selezionata viene spostata in cima; al massimo 5 elementi; nomi troncati a 22 caratteri
+- **Tap:** cliccando un chip si ri-seleziona la scuola sulla mappa e si apre la card animata
+
 ### Integrazione Chatbot (`chat.tsx`)
 
 La schermata chat effettua chiamate reali al backend:
@@ -410,7 +421,7 @@ app/(protected)/(tabs)/scuole.tsx
 | Dashboard risultati (match bar, statistiche) | ✅ Completato |
 | Ricerca scuole con filtri (provincia, indirizzo) | ✅ Completato |
 | Dettaglio scuola (info, indirizzi, calendario Open Days) | ✅ Completato |
-| Mappa interattiva (Leaflet + MapTiler, marker, card animata) | ✅ Completato |
+| Mappa interattiva (Leaflet + MapTiler, marker, card animata, cronologia ricerca) | ✅ Completato |
 | Chatbot AI "Orientamento AI" (con API reale) | ✅ Completato |
 | Profilo utente (dati, stato quiz, logout) | ✅ Completato |
 | Keyboard dismiss (tap fuori dalla tastiera) | ✅ Completato |
