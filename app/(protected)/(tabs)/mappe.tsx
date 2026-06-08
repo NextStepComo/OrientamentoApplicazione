@@ -5,7 +5,7 @@ import api from "@/utils/api";
 import { MaterialIcons } from "@expo/vector-icons";
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Animated, FlatList, ScrollView, TouchableOpacity, View } from "react-native";
+import { Animated, FlatList, Keyboard, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
 import { LatLng, LeafletView, MapMarker, WebViewLeafletEvents, WebviewLeafletMessage } from 'react-native-leaflet-view';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
@@ -29,32 +29,47 @@ export default function MappeScreen() {
   const [listaScuole, setListaScuole] = useState<any[]>([]);
   const { lat, lng, zoom } = useLocalSearchParams<{ lat?: string; lng?: string; zoom?: string }>();
   
+  // STATO PER TRACCIARE SE LA TASTIERA È APERTA
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
+
   const [mapCenter, setMapCenter] = useState<LatLng>(
     lat && lng 
       ? { lat: parseFloat(lat), lng: parseFloat(lng) }
       : DEFAULT_LOCATION
   );
+
   useEffect(() => {
+    // Listeners per rilevare lo stato della tastiera
+    const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
+    const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
+
     if (lat && lng) {
       setMapCenter({ lat: parseFloat(lat), lng: parseFloat(lng) });
     }
+    
     api.get("/acquire/scuolePosizione?provincia=XX")
-    .then(res => {
-      const scuole = res.data.map((s: any) => ({
-        id: s.denominazione_sede_direttivo,   
-        name: s.denominazione_sede_direttivo,
-        position: {
-          lat: parseFloat(s.coory),
-          lng: parseFloat(s.coorx)
-        }
-      }));
-      setListaScuole(scuole);
-    })
+      .then(res => {
+        const scuole = res.data.map((s: any) => ({
+          id: s.denominazione_sede_direttivo,   
+          name: s.denominazione_sede_direttivo,
+          position: {
+            lat: parseFloat(s.coory),
+            lng: parseFloat(s.coorx)
+          }
+        }));
+        setListaScuole(scuole);
+      })
       .catch(err => {
         console.log("Status:", err.response?.status);
         console.log("Detail:", err.response?.data);
         console.log("URL:", err.config?.url);
       });
+
+    // Clean up dei listener della tastiera
+    return () => {
+      keyboardDidShowListener.remove();
+      keyboardDidHideListener.remove();
+    };
   }, [lat, lng]);
 
   const allMarkers = useMemo(() => listaScuole.map(toMarker), [listaScuole]);
@@ -93,7 +108,7 @@ export default function MappeScreen() {
     <View style={{ flex: 1, paddingTop: insets.top }}>
 
       {/* Searchbar + suggerimenti */}
-      <View className="absolute top-10 left-4 right-4 z-10">
+      <View className="absolute top-10 left-4 right-4 z-20">
         <SearchBar placeholder="Cerca una scuola..." onSearch={handleSearch} onClear={handleClear} />
         {suggestions.length > 0 && (
           <View className="mt-1 bg-white border border-[#CCDFFD] rounded-2xl overflow-hidden shadow-md">
@@ -135,6 +150,14 @@ export default function MappeScreen() {
           url: 'https://api.maptiler.com/maps/base-v4/256/{z}/{x}/{y}@2x.png?key=uSZUpEZFzcQq5rQXoX5r',
         }]}
       />
+
+      {/* OVERLAY INVISIBILE: Intercetta i click quando la tastiera è aperta */}
+      {isKeyboardVisible && (
+        <Pressable 
+          onPress={Keyboard.dismiss} 
+          style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, zIndex: 15 }} 
+        />
+      )}
 
       {/* Card scuola selezionata */}
       {selectedScuola && (
