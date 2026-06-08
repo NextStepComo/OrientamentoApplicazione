@@ -3,6 +3,7 @@ import { SearchBar } from "@/components/ui/contentReusable";
 import { Text } from "@/components/ui/text";
 import api from "@/utils/api";
 import { MaterialIcons } from "@expo/vector-icons";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { router, useLocalSearchParams } from "expo-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Animated, FlatList, Keyboard, Pressable, ScrollView, TouchableOpacity, View } from "react-native";
@@ -10,6 +11,7 @@ import { LatLng, LeafletView, MapMarker, WebViewLeafletEvents, WebviewLeafletMes
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const DEFAULT_LOCATION: LatLng = { lat: 45.4741, lng: 9.1892 };
+const CACHE_KEY_SCUOLE_SELEZIONATE = '@cache_scuole_selezionate';
 
 const toMarker = (scuola: any): MapMarker => ({
   id: scuola.name,
@@ -28,7 +30,8 @@ export default function MappeScreen() {
   const cardAnim = useRef(new Animated.Value(0)).current;
   const [listaScuole, setListaScuole] = useState<any[]>([]);
   const { lat, lng, zoom } = useLocalSearchParams<{ lat?: string; lng?: string; zoom?: string }>();
-  
+  const [listaScuoleSelezionate, setListaScuoleSelezionate] = useState<any[]>([]);
+
   // STATO PER TRACCIARE SE LA TASTIERA È APERTA
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
 
@@ -38,8 +41,39 @@ export default function MappeScreen() {
       : DEFAULT_LOCATION
   );
 
+  // 1. CARICAMENTO DELLA CACHE ALL'AVVIO
   useEffect(() => {
-    // Listeners per rilevare lo stato della tastiera
+    const loadCache = async () => {
+      try {
+        const savedData = await AsyncStorage.getItem(CACHE_KEY_SCUOLE_SELEZIONATE);
+        if (savedData !== null) {
+          setListaScuoleSelezionate(JSON.parse(savedData));
+        }
+      } catch (error) {
+        console.error("Errore nel caricamento della cache delle scuole:", error);
+      }
+    };
+
+    loadCache();
+  }, []);
+
+  // 2. SALVATAGGIO IN CACHE AUTOMATICO AL CAMBIAMENTO DELLO STATO
+  useEffect(() => {
+    const saveCache = async () => {
+      try {
+        await AsyncStorage.setItem(CACHE_KEY_SCUOLE_SELEZIONATE, JSON.stringify(listaScuoleSelezionate));
+      } catch (error) {
+        console.error("Errore nel salvataggio della cache delle scuole:", error);
+      }
+    };
+
+    if (listaScuoleSelezionate.length > 0) {
+      saveCache();
+    }
+  }, [listaScuoleSelezionate]);
+
+  // 3. RECUPERO DATI API E GESTIONE TASTIERA
+  useEffect(() => {
     const keyboardDidShowListener = Keyboard.addListener('keyboardDidShow', () => setIsKeyboardVisible(true));
     const keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => setIsKeyboardVisible(false));
 
@@ -55,7 +89,8 @@ export default function MappeScreen() {
           position: {
             lat: parseFloat(s.coory),
             lng: parseFloat(s.coorx)
-          }
+          },
+          courses: s.indirizzi || [] // Mappatura preventiva per evitare crash sugli indirizzi
         }));
         setListaScuole(scuole);
       })
@@ -65,7 +100,6 @@ export default function MappeScreen() {
         console.log("URL:", err.config?.url);
       });
 
-    // Clean up dei listener della tastiera
     return () => {
       keyboardDidShowListener.remove();
       keyboardDidHideListener.remove();
@@ -74,9 +108,18 @@ export default function MappeScreen() {
 
   const allMarkers = useMemo(() => listaScuole.map(toMarker), [listaScuole]);
   
+  // 4. SELEZIONE SCUOLA E GESTIONE CRONOLOGIA (MAX 5 ELEMENTI)
   const selectScuola = (scuola: any) => {
     setMapCenter({ lat: scuola.position.lat, lng: scuola.position.lng });
     setSelectedScuola(scuola);
+    
+    setListaScuoleSelezionate((prevScuole) => {
+      // Rimuove la scuola se già presente per portarla in cima alla lista
+      const listaFiltrata = prevScuole.filter(s => s.id !== scuola.id);
+      // Aggiunge la nuova scuola in testa e mantiene solo le ultime 5 cercate
+      return [scuola, ...listaFiltrata].slice(0, 5);
+    });
+
     setSuggestions([]);
     cardAnim.setValue(0);
     Animated.spring(cardAnim, { toValue: 1, useNativeDriver: true, tension: 65, friction: 10 }).start();
@@ -107,9 +150,11 @@ export default function MappeScreen() {
   return (
     <View style={{ flex: 1, paddingTop: insets.top }}>
 
-      {/* Searchbar + suggerimenti */}
+      {/* Searchbar + Suggerimenti + Tag Cronologia Cache */}
       <View className="absolute top-10 left-4 right-4 z-20">
         <SearchBar placeholder="Cerca una scuola..." onSearch={handleSearch} onClear={handleClear} />
+        
+        {/* OPZIONE A: Menu a tendina dei suggerimenti attivi */}
         {suggestions.length > 0 && (
           <View className="mt-1 bg-white border border-[#CCDFFD] rounded-2xl overflow-hidden shadow-md">
             <FlatList
@@ -132,6 +177,32 @@ export default function MappeScreen() {
             />
           </View>
         )}
+
+        {/* OPZIONE B: Tag delle ultime scuole cercate in cache (visibili solo se non si sta digitando) */}
+        {suggestions.length === 0 && listaScuoleSelezionate.length > 0 && (
+          <View className="mt-2">
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false} 
+              keyboardShouldPersistTaps="handled"
+              className="-mx-1"
+            >
+              {listaScuoleSelezionate.map((scuola: any) => (
+                <TouchableOpacity
+                  key={scuola.id}
+                  onPress={() => selectScuola(scuola)}
+                  activeOpacity={0.8}
+                  className="mx-1 px-3 py-2 bg-white border border-[#CCDFFD] rounded-full shadow-sm flex-row items-center gap-1.5"
+                >
+                  <MaterialIcons name="history" size={14} color="#65758C" />
+                  <Text className="text-xs font-bold text-[#1A2433]" numberOfLines={1}>
+                    {scuola.name.length > 22 ? `${scuola.name.substring(0, 22)}...` : scuola.name}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
+        )}
       </View>
 
       {/* Mappa */}
@@ -151,7 +222,7 @@ export default function MappeScreen() {
         }]}
       />
 
-      {/* OVERLAY INVISIBILE: Intercetta i click quando la tastiera è aperta */}
+      {/* OVERLAY INVISIBILE: Chiude la tastiera se si clicca fuori */}
       {isKeyboardVisible && (
         <Pressable 
           onPress={Keyboard.dismiss} 
