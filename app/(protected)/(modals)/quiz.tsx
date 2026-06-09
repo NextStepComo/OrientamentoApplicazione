@@ -6,19 +6,34 @@ import { useEffect, useState } from "react";
 import { Pressable, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
-// Importazioni dai componenti della libreria React Native Reusable
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Text } from '@/components/ui/text';
 
-type InviaRisposta = { userID: number | undefined, domanda: number, risposta: number }
+// ✅ Tipi aggiornati per matchare il JSON reale
+type AnsText = {
+  r_id: string;       // ← era fuori, ora è dentro ogni risposta
+  titolo: string;
+  descrizione: string;
+}
+
+type QuizQandA = {
+  q_id: number;
+  q_text: string;
+  ans_text: AnsText[];
+}
+
+type InviaRisposta = {
+  userID: number | undefined;
+  domanda: number;
+  risposta: string;
+}
+
 type QuizResponse = { risposta: string }
-type AnsText = { cardTitolo1: string, cardDescrizione1: string, cardTitolo2: string, cardDescrizione2: string, cardTitolo3: string, cardDescrizione3: string }
-type QuizQandA = { q_id: number, q_text: string, ans_text: AnsText }
 
 export default function QuizScreen() {
-  const router = useRouter(); 
+  const router = useRouter();
   const { user, token } = useAuth();
   const [domandaCorrente, setDomandaCorrente] = useState(0);
   const [rispostaSelezionata, setRispostaSelezionata] = useState<string>("");
@@ -28,7 +43,7 @@ export default function QuizScreen() {
   const quizTerminato = async () => {
     try {
       await api.post<QuizResponse>("/quizCompletato", { token });
-      router.replace("/(protected)/(tabs)/contenuti"); 
+      router.replace("/(protected)/(tabs)/contenuti");
     } catch (err) {
       console.error("Errore durante il completamento del quiz:", err);
     }
@@ -43,7 +58,7 @@ export default function QuizScreen() {
     const response = await api.get<QuizQandA>(`/acquire/quizQuestions?q=${nQ}`);
     return response.data;
   };
-  
+
   useEffect(() => {
     Promise.all(Array.from({ length: 3 }, (_, i) => getQuizData(i + 1)))
       .then(setTutteDomande)
@@ -58,7 +73,8 @@ export default function QuizScreen() {
     const datiQuiz: InviaRisposta = {
       userID: user?.userid,
       domanda: domandaCorrente + 1,
-      risposta: parseInt(rispostaSelezionata, 10)
+      // ✅ Manda r_id della risposta scelta, non l'indice
+      risposta: tutteDomande[domandaCorrente].ans_text[parseInt(rispostaSelezionata)].r_id
     };
     sendQuizData(datiQuiz).catch((err) => console.error(err));
 
@@ -82,8 +98,11 @@ export default function QuizScreen() {
   const esUltimaDomanda = domandaCorrente === tutteDomande.length - 1;
   const disabilitato = rispostaSelezionata === "";
 
+  // Domanda e opzioni correnti
+  const domandaAttuale = tutteDomande[domandaCorrente];
+  const opzioni = domandaAttuale?.ans_text ?? [];
+
   return (
-    // Sfondo neutro chiaro e pulito
     <SafeAreaView className="flex-1 bg-[#F5F7FA]">
       <View className="flex-1 px-6 py-6 justify-between">
 
@@ -91,15 +110,13 @@ export default function QuizScreen() {
         <View className="gap-3.5">
           <View className="flex-row justify-between items-center">
             <Text className="text-[#556070] text-sm font-bold tracking-wide">Quiz di orientamento</Text>
-            {/* Badge con sfondo Tinta 20% e testo 100% */}
             <Badge className="bg-[#CCDFFD] border border-[#066CF4]/20 px-3 py-1 rounded-full">
               <Text className="text-[#066CF4] text-xs font-black">
-                {domandaCorrente + 1} / {tutteDomande.length}
+                {domandaCorrente + 1} / {tutteDomande.length || "..."}
               </Text>
             </Badge>
           </View>
 
-          {/* Barra del progresso basata sulla palette (Sfondo 20%, Fill 100%) */}
           <View className="h-2.5 bg-[#CCDFFD] rounded-full overflow-hidden">
             <View style={{ width: `${progresso}%` }} className="h-full bg-[#066CF4] rounded-full" />
           </View>
@@ -110,34 +127,34 @@ export default function QuizScreen() {
           <Text className="text-[#0B131F] text-3xl font-extrabold tracking-tight mb-1">
             Ciao {user?.full_name}!
           </Text>
+
           <View className="gap-1.5 mb-5">
             <Text className="text-[#066CF4] text-[11px] font-black tracking-widest uppercase">
               Domanda {domandaCorrente + 1}
             </Text>
             <Text className="text-[#1A2433] text-2xl font-bold leading-tight tracking-tight">
-              {tutteDomande[domandaCorrente]?.q_text ?? "Caricamento della domanda..."}
+              {/* ✅ Usa q_text dalla domanda corrente */}
+              {domandaAttuale?.q_text ?? "Caricamento della domanda..."}
             </Text>
           </View>
 
-          {/* OPZIONI DI RISPOSTA STILE RADIO-CARD INTERATTIVE */}
+          {/* ✅ Opzioni mappate da ans_text con r_id come chiave */}
           <View className="gap-3.5">
-            {["1", "2", "3"].map((idx) => {
-              const isSel = rispostaSelezionata === idx;
-              const t = tutteDomande[domandaCorrente]?.ans_text;
-              const title = idx === "1" ? t?.cardTitolo1 : idx === "2" ? t?.cardTitolo2 : t?.cardTitolo3;
-              const desc = idx === "1" ? t?.cardDescrizione1 : idx === "2" ? t?.cardDescrizione2 : t?.cardDescrizione3;
+            {opzioni.map((opzione, index) => {
+              const idxString = index.toString();
+              const isSel = rispostaSelezionata === idxString;
 
               return (
-                <Pressable 
-                  key={idx} 
-                  onPress={() => setRispostaSelezionata(idx)}
+                <Pressable
+                  key={opzione.r_id}              // ✅ r_id come key, stabile e univoco
+                  onPress={() => setRispostaSelezionata(idxString)}
                   className="active:opacity-95"
                 >
-                  <Card 
+                  <Card
                     className={`border-2 rounded-2xl p-0.5 shadow-sm ${
-                      isSel 
-                        ? "border-[#066CF4] bg-[#E6F0FE]" // Selezionato: Bordo 100% e Sfondo Tinta 10%
-                        : "border-[#CCDFFD] bg-white"      // Non selezionato: Bordo Tinta 20%
+                      isSel
+                        ? "border-[#066CF4] bg-[#E6F0FE]"
+                        : "border-[#CCDFFD] bg-white"
                     }`}
                   >
                     <CardHeader className="flex-row justify-between items-center p-4">
@@ -145,17 +162,16 @@ export default function QuizScreen() {
                         <CardTitle className={`text-base font-bold ${
                           isSel ? "text-[#066CF4]" : "text-[#1A2433]"
                         }`}>
-                          {title}
+                          {opzione.titolo}
                         </CardTitle>
                         <CardDescription className={`text-xs mt-1 leading-normal ${
                           isSel ? "text-[#4A5E7A]" : "text-[#65758C]"
                         }`}>
-                          {desc}
+                          {opzione.descrizione}
                         </CardDescription>
                       </View>
-                      
-                      {/* Radio Indicator Visuale */}
-                      <View 
+
+                      <View
                         className={`w-5 h-5 rounded-full border-2 items-center justify-center ${
                           isSel ? "border-[#066CF4] bg-[#066CF4]" : "border-[#A4B8D4] bg-transparent"
                         }`}
@@ -175,7 +191,7 @@ export default function QuizScreen() {
           <Button
             size="lg"
             className={`rounded-xl w-full h-14 shadow-md ${
-              disabilitato ? "bg-[#9BC2FB]" : "bg-[#066CF4]" // Disabilitato: Tinta 40% | Attivo: 100%
+              disabilitato ? "bg-[#9BC2FB]" : "bg-[#066CF4]"
             }`}
             onPress={avanza}
             disabled={disabilitato}
@@ -188,9 +204,9 @@ export default function QuizScreen() {
           </Button>
 
           {domandaCorrente > 0 && (
-            <Button 
-              variant="ghost" 
-              className="py-3 items-center justify-center" 
+            <Button
+              variant="ghost"
+              className="py-3 items-center justify-center"
               onPress={indietro}
             >
               <Text className="text-[#556070] text-sm font-bold">Indietro</Text>

@@ -80,7 +80,6 @@ export default function ChatPage() {
     setIsLoading(true);
 
     try {
-      console.log("Mando:", { inputText });
       const risposta = await api.post("/acquire/chat", { inputText });
       
       // Adatta il campo al tuo backend (reply, message, response, ecc.)

@@ -1,6 +1,6 @@
 // app/(protected)/(tabs)/contenuti.tsx
 import { MaterialIcons } from "@expo/vector-icons";
-import { Animated, Keyboard, ScrollView, TouchableOpacity, TouchableWithoutFeedback, View } from "react-native";
+import { Animated, Keyboard, ScrollView, TouchableWithoutFeedback, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import {
@@ -28,11 +28,6 @@ export default function ContenutiScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <ScrollView
-        className="flex-1"
-        contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
-        showsVerticalScrollIndicator={false}
-      >
         <View
           className="flex-1 bg-[#F5F7FA]"
           style={{ paddingTop: insets.top }}
@@ -40,7 +35,8 @@ export default function ContenutiScreen() {
           <ScrollView
             className="flex-1"
             contentContainerStyle={{ paddingBottom: insets.bottom + 96 }}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
+            keyboardShouldPersistTaps="handled"
           >
 
             {/* ── HERO BANNER ── */}
@@ -157,21 +153,10 @@ export default function ContenutiScreen() {
                   Cerca la scuola perfetta
                 </Text>
               </Button>
-
-              <TouchableOpacity
-                className="w-full py-3 flex-row items-center justify-center gap-2 rounded-xl"
-                activeOpacity={0.6}
-              >
-                <MaterialIcons name="refresh" size={18} color="#556070" />
-                <Text className="text-sm font-bold text-[#556070]" onPress={handleRedoQuestionario}>
-                  Rifai il quiz di orientamento
-                </Text>
-              </TouchableOpacity>
             </View>
 
           </ScrollView>
         </View>
-      </ScrollView>
     </TouchableWithoutFeedback>
   );
 }

@@ -200,7 +200,7 @@ export default function ScuoleScreen() {
   if (scuola && extra) {
     return (
       <View style={{ flex: 1, backgroundColor: "#F5F7FA", paddingTop: insets.top }}>
-        <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: NAVBAR_HEIGHT + 24 }}>
+        <ScrollView showsVerticalScrollIndicator={true} indicatorStyle="black" scrollIndicatorInsets={{ right: 1 }} contentContainerStyle={{ paddingBottom: NAVBAR_HEIGHT + 24 }}>
           <View className="bg-[#066CF4] px-5 pt-4 pb-8">
             <TouchableOpacity onPress={handleBack} activeOpacity={0.7} className="flex-row items-center gap-1.5 mb-5">
               <MaterialCommunityIcons name="arrow-left" size={20} color="#FFFFFF" />
